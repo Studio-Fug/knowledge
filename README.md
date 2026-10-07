@@ -129,14 +129,23 @@ design and meets the other full-verification conditions, including dependency
 verification. Fully verified does not imply physically built or tested; those
 remain separate evidence-based query dimensions (REQ-028).
 
+## Agreed remote cache retrieval
+
+Each cache uses an explicitly configured ordered list of remote cache internet
+addresses and ports. When an artifact is absent locally, retrieval tries those
+caches in order until a valid matching artifact is obtained or the list is
+exhausted (REQ-029).
+
+Retrieved content must be validated against the requested SHA-256 content
+address before it is accepted for local storage or use. Mismatched content is
+rejected and does not satisfy the request (REQ-030).
+
 ## Remaining decisions to make together
 
 1. What deterministic manifest format and byte encoding shall be hashed?
 2. When must implementation references become build dependencies? Is Bazel the
    first supported build system or just an example?
-3. How are remote caches selected, and must retrieved content be checked
-   against the requested SHA-256 before use?
-4. What is a semantic decomposition, and what search results count as correct
+3. What is a semantic decomposition, and what search results count as correct
    for the pump/aqueduct/bucket example?
 
 The guiding design preference is to keep the system as simple as possible.
