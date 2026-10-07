@@ -35,7 +35,12 @@ prevents that classification.
 Selection, retrieval for reuse, and dependency resolution require fully verified
 implementations by default. An explicit opt-in permits other implementations,
 whose verification status must remain visible, including across caches. These
-behaviors are captured in REQ-003 and REQ-010 through REQ-012.
+behaviors are captured in REQ-003 and REQ-010 through REQ-013.
+
+Full verification also requires every referenced implementation, directly or
+transitively, to be fully verified. Missing, incomplete, failed, stale, or unknown
+verification of a dependency prevents the containing implementation from being
+classified as fully verified.
 
 ## Remaining decisions to make together
 
