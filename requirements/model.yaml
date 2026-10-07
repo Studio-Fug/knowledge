@@ -260,3 +260,7 @@ requirements:
   - id: REQ-063
     title: The system shall eventually support scalable distributed deployment beyond the initial single-process local-disk CACHE while preserving artifact content addresses, verification semantics, access restrictions, and client API behavior; distributed storage and execution mechanisms and quantitative scale targets shall be defined in a later phase.
     satisfies: [UN-002]
+
+  - id: REQ-064
+    title: The initial CACHE shall accept SEMANTIC DECOMPOSITIONs supplied by external agents as constituent artifact data through its publication interface, including revisions submitted as new artifacts under the existing history and hashing rules; deployment shall not require CACHE-hosted decomposition generation or a particular model provider, and supplied claims shall remain subject to the evidence-based verification distinctions.
+    satisfies: [UN-001, UN-003]
