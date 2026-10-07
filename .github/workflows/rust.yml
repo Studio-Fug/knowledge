@@ -4,7 +4,10 @@ permissions:
   contents: read
 jobs:
   check:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - name: Install Rust
@@ -12,16 +15,16 @@ jobs:
       - name: Format
         run: cargo +stable fmt
       - name: Test
-        run: cargo +stable test --all-targets
+        run: cargo +stable test --locked --all-targets
       - name: Lint
-        run: cargo +stable clippy --all-targets -- -D warnings
+        run: cargo +stable clippy --locked --all-targets -- -D warnings
       - name: Export bootstrap formatting and lockfile
         if: always()
         run: |
           for file in Cargo.lock src/*.rs tests/*.rs; do
             if [ -f "$file" ]; then
               echo "KNOWLEDGE_FILE_BEGIN:$file"
-              base64 -w0 "$file"
+              base64 < "$file" | tr -d '\n'
               echo
               echo "KNOWLEDGE_FILE_END"
             fi

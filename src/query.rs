@@ -8,7 +8,7 @@ pub struct Query {
     pub text: String,
     pub trust_publisher: Option<String>,
     pub include_incomplete: bool,
-    pub minimum_rigor: Option<Rigor>,
+    pub rigor: Option<Rigor>,
     pub scope: Option<ScopeKind>,
     pub supported_claims_only: bool,
     pub exclude_superseded: bool,
@@ -53,16 +53,16 @@ pub fn search(cache: &Cache, query: &Query) -> Result<Search> {
         if !query.include_incomplete && summary.completeness != Completeness::ReportedComplete { continue; }
         if query.scope.is_some_and(|s| s != summary.subject.kind) { continue; }
         let claims: Vec<_> = artifact.payload.claims.iter().zip(&summary.claims).filter(|(_, s)| {
-            (!query.supported_claims_only || s.status == "publisher_reported_support") && query.minimum_rigor.is_none_or(|r| s.rigor.iter().any(|x| *x >= r))
+            (!query.supported_claims_only || s.status == "publisher_reported_support") && query.rigor.is_none_or(|r| s.rigor.iter().any(|x| *x == r))
         }).collect();
         let text = claims.iter().flat_map(|(c, _)| std::iter::once(c.text.as_str()).chain(c.aliases.iter().map(String::as_str))).collect::<Vec<_>>().join(" ");
-        let text = if query.supported_claims_only || query.minimum_rigor.is_some() { text } else { format!("{} {} {}", artifact.payload.specification.title, artifact.payload.specification.requirements.iter().map(|r| r.text.as_str()).collect::<Vec<_>>().join(" "), text) };
+        let text = if query.supported_claims_only || query.rigor.is_some() { text } else { format!("{} {} {}", artifact.payload.specification.title, artifact.payload.specification.requirements.iter().map(|r| r.text.as_str()).collect::<Vec<_>>().join(" "), text) };
         let available = tokens(&text);
         if !wanted.iter().all(|w| available.iter().any(|a| close(w, a))) { continue; }
-        if (query.supported_claims_only || query.minimum_rigor.is_some()) && claims.is_empty() { continue; }
+        if (query.supported_claims_only || query.rigor.is_some()) && claims.is_empty() { continue; }
         eligible.push((artifact, summary));
     }
-    let superseded: BTreeSet<_> = eligible.iter().flat_map(|(a, _)| a.payload.predecessors.iter().filter(|p| p.revision && p.address != a.address().unwrap_or_default()).map(|p| p.address.clone())).collect();
+    let superseded: BTreeSet<_> = eligible.iter().flat_map(|(a, _)| a.payload.predecessors.iter().filter(|p| p.revision && eligible.iter().any(|(old, summary)| summary.address == p.address && old.payload.publisher == a.payload.publisher)).map(|p| p.address.clone())).collect();
     let limit = if query.limit == 0 { 20 } else { query.limit };
     let matches = eligible.into_iter().map(|(_, s)| s).filter(|s| !query.exclude_superseded || !superseded.contains(&s.address)).take(limit).collect();
     Ok(Search { matches, scanned: addresses.len(), scope: "local_cache; publisher_assertions; eligible_revisions_only" })

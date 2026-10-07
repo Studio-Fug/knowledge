@@ -40,7 +40,7 @@ pub struct Specification {
 pub struct Requirement {
     pub id: String,
     pub text: String,
-    pub minimum_rigor: Option<Rigor>,
+    pub required_rigor: Option<Rigor>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -59,11 +59,11 @@ pub struct Step {
     pub acceptance: String,
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, clap::ValueEnum)]
 #[serde(rename_all = "snake_case")]
 pub enum Rigor { Analysis, Simulation, Software, Physical }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, clap::ValueEnum)]
 #[serde(rename_all = "snake_case")]
 pub enum ScopeKind { Design, Batch, Unit }
 
@@ -167,7 +167,7 @@ fn identifiers<'a>(values: impl Iterator<Item = &'a str>) -> Result<BTreeSet<&'a
 fn blobs(blobs: &[Blob]) -> Result<BTreeSet<&str>> {
     let paths = identifiers(blobs.iter().map(|b| b.path.as_str()))?;
     for blob in blobs {
-        if blob.path.contains('\\') || !Path::new(&blob.path).components().all(|c| matches!(c, Component::Normal(_))) {
+        if blob.path.contains('\\') || blob.path.split('/').any(|part| part.is_empty() || part == "." || part == "..") || !Path::new(&blob.path).components().all(|c| matches!(c, Component::Normal(_))) {
             return Err(Error::new("invalid_artifact", "blob path must be relative without traversal"));
         }
         if blob.data.len() % 2 != 0 || !blob.data.bytes().all(|c| c.is_ascii_digit() || (b'a'..=b'f').contains(&c)) {
@@ -281,7 +281,7 @@ impl Artifact {
         let subject = self.payload.subject_hash()?;
         let applicable = |e: &&Evidence| e.subject_hash == subject;
         let failed = self.payload.evidence.iter().filter(applicable).any(|e| e.outcome == Outcome::Fail);
-        let missing: Vec<String> = self.payload.specification.requirements.iter().filter(|r| !self.payload.evidence.iter().filter(applicable).any(|e| e.outcome == Outcome::Pass && e.requirements.contains(&r.id) && r.minimum_rigor.is_none_or(|minimum| e.rigor >= minimum))).map(|r| r.id.clone()).collect();
+        let missing: Vec<String> = self.payload.specification.requirements.iter().filter(|r| !self.payload.evidence.iter().filter(applicable).any(|e| e.outcome == Outcome::Pass && e.requirements.contains(&r.id) && r.required_rigor.is_none_or(|minimum| e.rigor == minimum))).map(|r| r.id.clone()).collect();
         let completeness = if failed { Completeness::Failed } else if !missing.is_empty() || self.payload.procedure.is_empty() { Completeness::Incomplete } else { Completeness::ReportedComplete };
         let trusted = trusted_publisher == Some(self.payload.publisher.as_str());
         let claims = self.payload.claims.iter().map(|claim| {

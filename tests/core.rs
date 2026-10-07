@@ -6,7 +6,7 @@ fn fixture() -> Artifact {
     let publisher = hex::encode(key.verifying_key().to_bytes());
     let mut payload = Payload {
         version: 1, publisher: publisher.clone(),
-        specification: Specification { title: "Bucket".into(), requirements: vec![Requirement { id: "WATER".into(), text: "Move water".into(), minimum_rigor: Some(Rigor::Physical) }] },
+        specification: Specification { title: "Bucket".into(), requirements: vec![Requirement { id: "WATER".into(), text: "Move water".into(), required_rigor: Some(Rigor::Physical) }] },
         design: vec![Blob { path: "design.txt".into(), data: hex::encode("test fixture, not a real verified design") }],
         procedure: vec![Step { id: "TEST".into(), instructions: "Transfer the specified volume under the stated conditions".into(), acceptance: "Measured volume reaches destination".into() }],
         subject: PhysicalScope { kind: ScopeKind::Unit, identifier: "fixture-1".into(), conditions: "Synthetic test data only".into() },
@@ -83,7 +83,7 @@ fn search_uses_labels_rigor_and_eligible_revision_history() {
     let cache = Cache::open(dir.path()).unwrap();
     let original = fixture();
     let address = cache.put(&original).unwrap();
-    let query = Query { text: "method for moving water".into(), minimum_rigor: Some(Rigor::Physical), supported_claims_only: true, exclude_superseded: true, ..Default::default() };
+    let query = Query { text: "method for moving water".into(), rigor: Some(Rigor::Physical), supported_claims_only: true, exclude_superseded: true, ..Default::default() };
     let found = query::search(&cache, &query).unwrap();
     assert_eq!(found.matches.len(), 1);
     assert!(!found.matches[0].reusable);
@@ -118,4 +118,65 @@ fn http_is_loopback_read_only_and_substitution_checks_hash() {
     assert_eq!(client.fetch(&address, std::slice::from_ref(&origin)).unwrap().address().unwrap(), address);
     assert!(client.fetch(&"0".repeat(64), &[origin]).is_err());
     worker.join().unwrap();
+}
+
+#[test]
+fn dishonest_substituter_cannot_insert_another_hash() {
+    let server = server::bind("127.0.0.1:0".parse().unwrap()).unwrap();
+    let origin = format!("http://{}", server.server_addr());
+    let artifact = fixture();
+    let bytes = canonical::encode(&artifact).unwrap();
+    let worker = std::thread::spawn(move || {
+        server.recv().unwrap().respond(tiny_http::Response::from_data(bytes)).unwrap();
+    });
+    let directory = tempfile::tempdir().unwrap();
+    let cache = Cache::open(directory.path()).unwrap();
+    assert!(cache.fetch(&"0".repeat(64), &[origin]).is_err());
+    assert!(cache.addresses().unwrap().is_empty());
+    worker.join().unwrap();
+}
+
+#[test]
+fn categories_are_not_interchangeable_and_inferences_are_not_reports() {
+    let artifact = fixture();
+    let mut payload = artifact.payload.clone();
+    payload.specification.requirements[0].required_rigor = Some(Rigor::Software);
+    payload.evidence[0].subject_hash = payload.subject_hash().unwrap();
+    let changed = Artifact::seal(payload, &SigningKey::from_bytes(&[7; 32])).unwrap();
+    assert_eq!(changed.summary(None, "test".into()).unwrap().completeness, Completeness::Incomplete);
+    let mut payload = artifact.payload;
+    payload.claims[0].evidence.clear();
+    payload.claims[0].text = "Smart faucet".into();
+    let changed = Artifact::seal(payload, &SigningKey::from_bytes(&[7; 32])).unwrap();
+    assert_eq!(changed.summary(None, "test".into()).unwrap().completeness, Completeness::ReportedComplete);
+    let directory = tempfile::tempdir().unwrap();
+    let cache = Cache::open(directory.path()).unwrap();
+    cache.put(&changed).unwrap();
+    assert!(query::search(&cache, &Query { text: "smart faucet".into(), rigor: Some(Rigor::Physical), ..Default::default() }).unwrap().matches.is_empty());
+}
+
+#[test]
+fn water_query_finds_alternatives_and_only_same_publisher_revisions_hide() {
+    let directory = tempfile::tempdir().unwrap();
+    let cache = Cache::open(directory.path()).unwrap();
+    let bucket = fixture();
+    let address = cache.put(&bucket).unwrap();
+    for (index, name) in ["Pump", "Aqueduct"].iter().enumerate() {
+        let mut payload = bucket.payload.clone();
+        payload.specification.title = (*name).into();
+        payload.evidence[0].subject_hash = payload.subject_hash().unwrap();
+        payload.predecessors.push(Predecessor { address: address.clone(), contribution: "Another publisher asserts a revision".into(), revision: true });
+        let key = SigningKey::from_bytes(&[8 + index as u8; 32]);
+        cache.put(&Artifact::seal(payload, &key).unwrap()).unwrap();
+    }
+    let found = query::search(&cache, &Query { text: "method for moving water".into(), exclude_superseded: true, ..Default::default() }).unwrap();
+    assert_eq!(found.matches.len(), 3);
+    assert!(found.matches.iter().any(|m| m.address == address));
+    let mut payload = bucket.payload;
+    payload.claims[0].aliases.push("water carrier".into());
+    payload.predecessors.push(Predecessor { address: address.clone(), contribution: "Updated labels".into(), revision: true });
+    cache.put(&Artifact::seal(payload, &SigningKey::from_bytes(&[7; 32])).unwrap()).unwrap();
+    let found = query::search(&cache, &Query { text: "moving water".into(), exclude_superseded: true, ..Default::default() }).unwrap();
+    assert_eq!(found.matches.len(), 3);
+    assert!(!found.matches.iter().any(|m| m.address == address));
 }

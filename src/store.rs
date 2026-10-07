@@ -33,6 +33,7 @@ impl Cache {
 
     pub fn get(&self, address: &str) -> Result<Artifact> {
         let path = self.path(address)?;
+        if !path.try_exists()? { return Err(Error::new("not_found", "artifact is not cached")); }
         regular(&path)?;
         let mut bytes = Vec::new();
         File::open(path)?.take((canonical::MAX_BYTES + 1) as u64).read_to_end(&mut bytes)?;

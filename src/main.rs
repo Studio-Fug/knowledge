@@ -34,6 +34,8 @@ enum Command {
         #[arg(long)] trust_publisher: Option<String>,
         #[arg(long)] include_incomplete: bool,
         #[arg(long)] physical: bool,
+        #[arg(long, value_enum, conflicts_with = "physical")] rigor: Option<Rigor>,
+        #[arg(long, value_enum)] scope: Option<ScopeKind>,
         #[arg(long)] supported_claims_only: bool,
         #[arg(long)] exclude_superseded: bool,
         #[arg(long, default_value_t = 20)] limit: usize,
@@ -102,7 +104,7 @@ fn run(cli: Cli) -> Result<()> {
                     print(&serde_json::json!({"address":cache.put(&artifact)?}))
                 }
                 Command::Get { address, substituter } => print(&cache.fetch(&address, &substituter)?),
-                Command::Search { text, trust_publisher, include_incomplete, physical, supported_claims_only, exclude_superseded, limit } => print(&query::search(&cache, &Query { text, trust_publisher, include_incomplete, minimum_rigor: physical.then_some(Rigor::Physical), supported_claims_only, exclude_superseded, limit, scope: None::<ScopeKind> })?),
+                Command::Search { text, trust_publisher, include_incomplete, physical, rigor, scope, supported_claims_only, exclude_superseded, limit } => print(&query::search(&cache, &Query { text, trust_publisher, include_incomplete, rigor: if physical { Some(Rigor::Physical) } else { rigor }, supported_claims_only, exclude_superseded, limit, scope })?),
                 Command::Serve { listen, allow_publisher } => {
                     if allow_publisher.iter().any(|p| !canonical::is_hex(p, 32)) { return Err(Error::new("invalid_key", "invalid allowed publisher")); }
                     let http = server::bind(listen)?;

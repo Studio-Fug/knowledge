@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "publisher": "0000000000000000000000000000000000000000000000000000000000000000",
+  "specification": {
+    "title": "A bucket (unverified example)",
+    "requirements": [{"id":"WATER","text":"Move water between two locations","required_rigor":null}]
+  },
+  "design": [{"path":"design.txt","data":"41206275636b6574207769746820612068616e646c652e"}],
+  "procedure": [],
+  "subject": {"kind":"design","identifier":"example-bucket","conditions":"Example only; not built or tested"},
+  "evidence": [],
+  "records": [],
+  "claims": [{"kind":"capability","text":"Moves water","aliases":["method for moving water"],"evidence":[]}],
+  "predecessors": [],
+  "dependencies": []
+}

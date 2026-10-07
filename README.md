@@ -10,7 +10,7 @@ Sellers can offer physical products or access to the designs and test evidence.
 Every version has a permanent fingerprint and a history. Hosts can share the
 catalog while controlling access to paid content.
 
-Currently defining requirements; implementation comes next.
+Initial Rust prototype: local cache, signed artifacts, search, and an agent API.
 
 [Design and decisions](docs/design.md) · [Requirements](requirements/) ·
-[Risk analysis](docs/risk-analysis.md)
+[Risk analysis](docs/risk-analysis.md) · [Run it](docs/implementation.md)
