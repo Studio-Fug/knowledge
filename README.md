@@ -267,9 +267,18 @@ A valid signature authenticates the signing identity; it does not establish
 the truth of verification claims, reproduction fidelity, independence, or a
 trusted real-world identity (REQ-049).
 
-The signed representation remains to be defined. It must reconcile signature
-inclusion with full hash coverage without making a signature depend on a hash
-that includes that same signature. No exception to REQ-019 has been agreed.
+Signed artifacts use two stages (REQ-050 and REQ-051):
+
+1. Hash the deterministic payload and sign that payload hash.
+2. Hash the complete artifact containing the payload, signature, and signing
+   metadata. This final SHA-256 is the database content address.
+
+The payload hash is an internal signing value, not another first-class object
+or retrieval address. Dependency and predecessor links use the final artifact
+address. Validation checks both the signature over the recomputed payload hash
+and the final content address. Changes to payload, signature, or signing
+metadata change the final address. Every stored bit remains covered by hashing,
+without making the signature depend on a hash containing itself.
 
 ## Remaining decisions to make together
 
