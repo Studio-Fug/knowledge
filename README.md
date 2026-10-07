@@ -430,6 +430,19 @@ manufacturing know-how, with independently released keys. Unlocking one scope
 does not unlock the other. Payment requests, grants, and key release identify
 the exact artifact hash and authorized scope (REQ-076).
 
+## Initial reports and future proof support
+
+The initial system supports signed verification reports, scoped to the exact
+artifact, specification, claims, and rigor. Report access remains controlled;
+signature validation is distinct from establishing the truth of the evidence
+or checking the reported claims (REQ-077).
+
+Zero-knowledge proof generation and checking are future extensions through a
+hook bound to artifact commitments and explicit claims. No proof system is
+required for initial deployment. Extensions preserve access scopes and the
+single artifact object type; unsupported or unchecked proofs are exposed as
+such (REQ-078).
+
 ## Remaining decisions to make together
 
 1. What deterministic manifest format and byte encoding shall be hashed?
