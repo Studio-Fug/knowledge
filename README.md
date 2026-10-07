@@ -192,6 +192,22 @@ constituents of the same artifact, with controlled partial disclosure rather
 than additional first-class object types. Public portions and proofs must be
 bound to the artifact's content address; no object data is exempt from hashing.
 
+## Independent re-verification
+
+An authorized recipient may rerun validation checks and contribute a report
+and evidence in a new artifact linked to the original as a predecessor. The
+report identifies the exact specification and design checked, checks and
+conditions, results, and verifying party. The original remains unchanged
+(REQ-039).
+
+Reports distinguish publisher evidence from recipient or third-party
+re-verification, with provenance and scope visible. A hash, cryptographic proof,
+or claim of independence alone does not establish that physical measurements
+are truthful or that parties are independent (REQ-040). Proof of authentic
+evidence remains a desired direction, with source authentication and trust
+assumptions unresolved. No reputation, payment arbitration, or consensus
+mechanism has yet been selected.
+
 ## Remaining decisions to make together
 
 1. What deterministic manifest format and byte encoding shall be hashed?
