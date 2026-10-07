@@ -72,3 +72,11 @@ requirements:
   - id: REQ-016
     title: Each derived version of a database object shall record the CONTENT ADDRESSes of one or more predecessor objects that contributed conceptually to its production, and shall include all of those addresses in the content used to compute its own CONTENT ADDRESS, forming an explicit traversable provenance graph; an initial object with no predecessors shall record an empty predecessor set.
     satisfies: [UN-001, UN-002]
+
+  - id: REQ-017
+    title: Each predecessor link shall include a human-readable explanation of its conceptual contribution; the system shall expose that explanation as display-only, non-authoritative metadata, and shall not use it to establish verification status, dependency relationships, or lineage conclusions.
+    satisfies: [UN-001]
+
+  - id: REQ-018
+    title: Agents deriving a provenance account shall examine the linked objects' REQUIREMENT SPECIFICATIONs, IMPLEMENTATIONs, and SEMANTIC DECOMPOSITIONs and draw their own conclusions about lineage rather than treating predecessor explanations as authoritative evidence.
+    satisfies: [UN-001, UN-003]
