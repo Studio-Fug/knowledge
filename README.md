@@ -61,6 +61,14 @@ These behaviors are captured in REQ-014 through REQ-016.
 Predecessors record conceptual provenance; they are not implementation dependencies. A fully
 verified version may therefore follow an incompletely verified version.
 
+Each predecessor link includes a human-readable explanation of its conceptual
+contribution. This explanation is display-only and non-authoritative: it does
+not establish verification status, dependencies, or lineage conclusions.
+Agents deriving a provenance account must examine the linked specifications,
+implementations, and semantic decompositions and draw their own conclusions.
+These behaviors are captured in REQ-017 and REQ-018. Whether display metadata
+participates in content addressing remains to be decided.
+
 ## Remaining decisions to make together
 
 1. What evidence and verification rigor does each requirement demand?
