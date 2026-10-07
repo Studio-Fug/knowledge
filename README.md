@@ -26,8 +26,22 @@ a draft for discussion, not a claim that the system satisfies them.
 
 ## Decisions to make together
 
-1. What makes a verification report complete? Must every requirement have
-   evidence, and may an implementation carry failed or unverified results?
+## Agreed verification behavior
+
+The database may hold incomplete verification evidence to make remaining work
+visible. A machine-readable status must distinguish those implementations from
+fully verified implementations. Fully verified means passing evidence covers
+every requirement for the concrete design; missing, failed, or stale evidence
+prevents that classification.
+
+Selection, retrieval for reuse, and dependency resolution require fully verified
+implementations by default. An explicit opt-in permits other implementations,
+whose verification status must remain visible, including across caches. These
+behaviors are captured in REQ-003 and REQ-010 through REQ-012.
+
+## Remaining decisions to make together
+
+1. What evidence and verification rigor does each requirement demand?
 2. What exact bytes does a content address hash? How are multi-file designs and
    references represented?
 3. Can one specification map to multiple implementations, and can one
