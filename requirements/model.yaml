@@ -96,3 +96,11 @@ requirements:
   - id: REQ-022
     title: The database shall permit multiple REQUIREMENTS-TO-IMPLEMENTATION ARTIFACTs containing the same REQUIREMENT SPECIFICATION and different IMPLEMENTATIONs; each alternative shall retain its own VERIFICATION REPORT, CONTENT ADDRESS, and provenance history.
     satisfies: [UN-001, UN-003]
+
+  - id: REQ-023
+    title: The database shall represent the same concrete design against different REQUIREMENT SPECIFICATIONs as separate REQUIREMENTS-TO-IMPLEMENTATION ARTIFACTs; each artifact's IMPLEMENTATION shall provide verification artifacts tracing that design to the particular specification in that artifact.
+    satisfies: [UN-001]
+
+  - id: REQ-024
+    title: When constructing a new REQUIREMENTS-TO-IMPLEMENTATION ARTIFACT, the system shall permit direct reuse of verification evidence cached in an existing artifact when that evidence applies to the concrete design and covers the new specification's full traceability requirements; the new artifact shall contain the reused evidence and its trace to the new specification, and shall determine its own verification status rather than inherit the source artifact's status.
+    satisfies: [UN-001, UN-002]
