@@ -50,7 +50,7 @@ requirements:
     satisfies: [UN-001]
 
   - id: REQ-011
-    title: The system shall expose a machine-readable verification status for each IMPLEMENTATION and shall classify it as fully verified only when passing evidence covers every requirement in its REQUIREMENT SPECIFICATION for that concrete design; missing, failed, or stale evidence shall prevent that classification.
+    title: The system shall expose a machine-readable verification status for each IMPLEMENTATION and shall classify it as fully verified only when passing evidence covers every requirement in its REQUIREMENT SPECIFICATION for that concrete design and meets any evidence or rigor demands explicitly specified; missing, failed, or stale evidence shall prevent that classification.
     satisfies: [UN-001]
 
   - id: REQ-012
@@ -104,3 +104,15 @@ requirements:
   - id: REQ-024
     title: When constructing a new REQUIREMENTS-TO-IMPLEMENTATION ARTIFACT, the system shall permit direct reuse of verification evidence cached in an existing artifact when that evidence applies to the concrete design and covers the new specification's full traceability requirements; the new artifact shall contain the reused evidence and its trace to the new specification, and shall determine its own verification status rather than inherit the source artifact's status.
     satisfies: [UN-001, UN-002]
+
+  - id: REQ-025
+    title: A REQUIREMENT SPECIFICATION may define required verification evidence and rigor levels; the system shall permit specifications that omit those demands and shall enforce them when explicitly specified.
+    satisfies: [UN-001]
+
+  - id: REQ-026
+    title: The VERIFICATION REPORT shall record the verification methods and rigor actually supported by its evidence, traceable to the requirements and concrete design verified, whether or not the REQUIREMENT SPECIFICATION demands a particular rigor level; absent evidence shall not establish an achieved rigor level.
+    satisfies: [UN-001, UN-003]
+
+  - id: REQ-027
+    title: The system shall support querying artifacts by achieved verification rigor in combination with semantic requirement search, including finding smart faucet designs supported by evidence of physical construction and testing while excluding designs supported only by simulation; results shall expose which requirements and design elements the qualifying evidence covers.
+    satisfies: [UN-001, UN-003]
