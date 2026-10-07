@@ -318,6 +318,17 @@ use selected passing components in a verified assembly. Evidence and SOPs
 identify the tested scope and selection or screening conditions. Verification
 does not extend automatically to untested components or units (REQ-057).
 
+## Verification scope
+
+Reports distinguish design verification, batch verification, and individual-unit
+verification. Claims and supporting evidence identify the applicable design
+revision, batch or lot, or individual unit. Verification at one scope does not
+automatically establish verification at another (REQ-058).
+
+Browsing and search summaries expose claim scope and support filtering by these
+scopes, subject to access restrictions. Scope identifiers and evidence remain
+hashed constituent data of artifacts, not new first-class objects (REQ-059).
+
 ## Remaining decisions to make together
 
 1. What deterministic manifest format and byte encoding shall be hashed?
