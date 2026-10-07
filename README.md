@@ -425,6 +425,11 @@ relationship to the signed payload and final artifact hash remain to be defined.
 Ciphertext distribution is compatible with access restrictions because plaintext
 and keys remain controlled. Key release cannot retract copies already decrypted.
 
+Verification reports and evidence can be encrypted separately from design and
+manufacturing know-how, with independently released keys. Unlocking one scope
+does not unlock the other. Payment requests, grants, and key release identify
+the exact artifact hash and authorized scope (REQ-076).
+
 ## Remaining decisions to make together
 
 1. What deterministic manifest format and byte encoding shall be hashed?
