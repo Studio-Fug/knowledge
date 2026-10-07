@@ -90,5 +90,5 @@ requirements:
     satisfies: [UN-001, UN-002, UN-003]
 
   - id: REQ-021
-    title: The system shall persist an agent's inference as a database entry only when the agent produces a new REQUIREMENTS-TO-IMPLEMENTATION ARTIFACT; it shall not create standalone inference, reasoning, or provenance-account objects.
+    title: The system shall include an agent's inference only as constituent data of a new REQUIREMENTS-TO-IMPLEMENTATION ARTIFACT and only when that inference contributes to the artifact's traceability; inference that does not contribute to traceability shall be omitted, and the system shall not create standalone inference, reasoning, or provenance-account objects.
     satisfies: [UN-001]
