@@ -34,7 +34,8 @@ a draft for discussion, not a claim that the system satisfies them.
 The database may hold incomplete verification evidence to make remaining work
 visible. A machine-readable status must distinguish those implementations from
 fully verified implementations. Fully verified means passing evidence covers
-every requirement for the concrete design; missing, failed, or stale evidence
+every requirement for the concrete design and meets any explicitly specified
+evidence or rigor demands; missing, failed, or stale evidence
 prevents that classification.
 
 Selection, retrieval for reuse, and dependency resolution require fully verified
@@ -108,9 +109,23 @@ requirements. The new artifact contains the reused evidence and its trace to
 the new specification. Its verification status is determined against that
 specification rather than inherited from the source artifact (REQ-024).
 
+## Agreed verification rigor and discovery
+
+Specifications may demand particular evidence or rigor levels, but are not
+required to do so. Explicit demands must be met (REQ-025).
+
+Reports record verification methods and rigor actually supported by evidence,
+with traceability to the requirements and design verified. Omission of a rigor
+demand does not establish achieved rigor (REQ-026).
+
+Achieved rigor is queryable alongside semantic requirements. For example,
+"Show me smart faucet designs that have actually been built and tested" must
+distinguish physical construction and testing evidence from simulation alone.
+Results expose the scope covered by the qualifying evidence (REQ-027).
+
 ## Remaining decisions to make together
 
-1. What evidence and verification rigor does each requirement demand?
+1. When rigor is unspecified, what evidence suffices for full verification?
 2. What deterministic manifest format and byte encoding shall be hashed?
 3. When must implementation references become build dependencies? Is Bazel the
    first supported build system or just an example?
