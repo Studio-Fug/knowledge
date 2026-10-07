@@ -288,10 +288,28 @@ first-class database objects. Changing permissions leaves artifact content,
 publisher identity, and content address unchanged (REQ-052). This separates
 mutable access policy from the full hash coverage of artifact data.
 
-The commercial mechanism charges for access to artifact content, not ownership
-of the ideas. Each cache enforces applicable grants and revocations on subsequent
+The commercial mechanism charges for physical articles or access to artifact
+content and manufacturing know-how, not ownership of the ideas. Each cache enforces applicable grants and revocations on subsequent
 access requests, including evidence and implementation requests (REQ-053).
 Revocation governs future access; it does not erase content already delivered.
+
+
+## Physical articles and assembly value
+
+Buying a physical article does not grant its design or manufacturing know-how.
+The verification report may be disclosed separately. Know-how may be sold in a
+separate transaction with its own price and permissions (REQ-054).
+
+An integrator may offer a validated assembly with a report tracing to the
+assembly specification without disclosing component designs, know-how, reports,
+or other component data. Assembly purchase grants no automatic component access
+(REQ-055). Assembly-validation work is a distinct contribution to value from
+component-validation work, and may be compensated independently (REQ-056).
+Know-how may command a higher price; no fixed pricing rule has been selected.
+
+SOPs and reproducibility information remain included in artifacts but subject to
+access restrictions. Inclusion does not require disclosure to physical-article
+buyers. Dependency verification and component-data disclosure are separate.
 
 ## Remaining decisions to make together
 
