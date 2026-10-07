@@ -94,12 +94,15 @@ to traceability is omitted. Producing a new artifact does not by itself justify
 including the inference; standalone reasoning or provenance accounts are not
 database objects (REQ-021).
 
+The same requirement specification may appear in multiple artifacts with
+different implementations. Each alternative retains its own verification
+report, content address, and provenance history (REQ-022).
+
 ## Remaining decisions to make together
 
 1. What evidence and verification rigor does each requirement demand?
 2. What deterministic manifest format and byte encoding shall be hashed?
-3. Can one specification map to multiple implementations, and can one
-   implementation satisfy multiple specifications?
+3. Can one implementation satisfy multiple specifications?
 4. When must implementation references become build dependencies? Is Bazel the
    first supported build system or just an example?
 5. How are remote caches selected, and must retrieved content be checked
