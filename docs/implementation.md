@@ -7,7 +7,7 @@ other caches. It does not execute designs or test procedures.
 
 ## Run
 
-Install stable Rust, then:
+Install Rust through rustup; the repository pins toolchain 1.99.0. Then:
 
 ```sh
 cargo build --locked

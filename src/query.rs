@@ -29,12 +29,19 @@ pub struct Search {
 fn tokens(text: &str) -> BTreeSet<String> {
     text.to_lowercase()
         .split(|c: char| !c.is_alphanumeric())
-        .filter(|t| !t.is_empty() && !["a", "an", "the", "for", "to", "of", "and", "method"].contains(t))
+        .filter(|t| {
+            !t.is_empty() && !["a", "an", "the", "for", "to", "of", "and", "method"].contains(t)
+        })
         .map(|t| {
-            let root = t.strip_suffix("ing")
+            let root = t
+                .strip_suffix("ing")
                 .or_else(|| t.strip_suffix('s'))
                 .unwrap_or(t);
-            if root.len() > 3 { root.strip_suffix('e').unwrap_or(root).to_owned() } else { root.to_owned() }
+            if root.len() > 3 {
+                root.strip_suffix('e').unwrap_or(root).to_owned()
+            } else {
+                root.to_owned()
+            }
         })
         .collect()
 }

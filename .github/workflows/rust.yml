@@ -13,19 +13,8 @@ jobs:
       - name: Install Rust
         run: rustup toolchain install 1.99.0 --profile minimal --component rustfmt,clippy
       - name: Format
-        run: cargo fmt
+        run: cargo fmt --check
       - name: Test
         run: cargo test --locked --all-targets
       - name: Lint
         run: cargo clippy --locked --all-targets -- -D warnings
-      - name: Export bootstrap formatting and lockfile
-        if: always()
-        run: |
-          for file in Cargo.lock src/*.rs tests/*.rs; do
-            if [ -f "$file" ]; then
-              echo "KNOWLEDGE_FILE_BEGIN:$file"
-              base64 < "$file" | tr -d '\n'
-              echo
-              echo "KNOWLEDGE_FILE_END"
-            fi
-          done
