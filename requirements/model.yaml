@@ -308,3 +308,7 @@ requirements:
   - id: REQ-075
     title: Syndicated encrypted content shall be cryptographically bound to the identified artifact and validated before acceptance, and authorized recipients shall validate decrypted content against the artifact's committed content before use; private decryption keys shall be protected CACHE operational secrets rather than publicly distributed artifact data, and all stored encrypted artifact data and public encryption metadata shall remain covered by artifact content addressing.
     satisfies: [UN-001, UN-002]
+
+  - id: REQ-076
+    title: The system shall support separate encryption scopes and independently released decryption keys for verification reports and evidence versus concrete design and manufacturing know-how; authorizing or decrypting one scope shall not unlock the other, and payment requests, grants, and key release shall identify the exact artifact CONTENT ADDRESS and authorized scope.
+    satisfies: [UN-001, UN-002]
