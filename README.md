@@ -44,10 +44,12 @@ implementations by default. An explicit opt-in permits other implementations,
 whose verification status must remain visible, including across caches. These
 behaviors are captured in REQ-003 and REQ-010 through REQ-013.
 
-Full verification also requires every implementation dependency, directly or
-transitively, to be fully verified. Missing, incomplete, failed, stale, or unknown
-verification of a dependency prevents the containing implementation from being
-classified as fully verified.
+Full verification requires coverage of dependency-related obligations in the
+assembly specification, using applicable component evidence or verification
+performed for the assembly. Previously unverified components do not prevent
+full verification when assembly evidence covers every requirement and explicit
+rigor demand. Missing required evidence still prevents full verification.
+This replaces the earlier blanket requirement for fully verified dependencies.
 
 ## Agreed content addressing and history
 
@@ -126,8 +128,8 @@ Results expose the scope covered by the qualifying evidence (REQ-027).
 
 When the specification demands no particular rigor, passing simulation evidence
 may establish full verification if it covers every requirement for the concrete
-design and meets the other full-verification conditions, including dependency
-verification. Fully verified does not imply physically built or tested; those
+design and meets the other full-verification conditions, including coverage of
+dependency-related obligations. Fully verified does not imply physically built or tested; those
 remain separate evidence-based query dimensions (REQ-028).
 
 ## Agreed remote cache retrieval
@@ -310,6 +312,11 @@ Know-how may command a higher price; no fixed pricing rule has been selected.
 SOPs and reproducibility information remain included in artifacts but subject to
 access restrictions. Inclusion does not require disclosure to physical-article
 buyers. Dependency verification and component-data disclosure are separate.
+
+Integrators may test previously unverified components, discard failures, and
+use selected passing components in a verified assembly. Evidence and SOPs
+identify the tested scope and selection or screening conditions. Verification
+does not extend automatically to untested components or units (REQ-057).
 
 ## Remaining decisions to make together
 
