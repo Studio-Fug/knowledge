@@ -24,8 +24,6 @@ a draft for discussion, not a claim that the system satisfies them.
 - **SEMANTIC DECOMPOSITION**: a representation used to discover requirement
   specifications by meaning. Its structure is still to be defined.
 
-## Decisions to make together
-
 ## Agreed verification behavior
 
 The database may hold incomplete verification evidence to make remaining work
