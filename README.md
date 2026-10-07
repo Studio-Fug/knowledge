@@ -45,8 +45,9 @@ classified as fully verified.
 ## Agreed content addressing and history
 
 An implementation's content address is the SHA-256 of a deterministic manifest
-identifying its specification, design files, verification report and evidence,
-dependencies, and predecessors by content address where present. The precise
+covering all of its data, including its specification, design files, verification
+report and evidence, semantic decomposition, dependencies, predecessors, and
+display-only explanations. Referenced content is identified by content address. The precise
 manifest format and byte encoding remain to be defined.
 
 Objects are immutable. New evidence, features, requirements, or changes in
@@ -61,13 +62,21 @@ These behaviors are captured in REQ-014 through REQ-016.
 Predecessors record conceptual provenance; they are not implementation dependencies. A fully
 verified version may therefore follow an incompletely verified version.
 
+
 Each predecessor link includes a human-readable explanation of its conceptual
 contribution. This explanation is display-only and non-authoritative: it does
 not establish verification status, dependencies, or lineage conclusions.
 Agents deriving a provenance account must examine the linked specifications,
 implementations, and semantic decompositions and draw their own conclusions.
-These behaviors are captured in REQ-017 and REQ-018. Whether display metadata
-participates in content addressing remains to be decided.
+These behaviors are captured in REQ-017 and REQ-018.
+
+Every bit of an object's stored data is covered by its content address, directly
+or through content-addressed references. This includes display-only and
+non-authoritative metadata: editing a predecessor explanation creates a new
+object and hash. No object metadata sits outside this coverage (REQ-019).
+This preserves the exact data available to an agent for reproducing an
+inference chain. Hash coverage preserves inputs; it does not make explanations
+authoritative or guarantee that an agent will reproduce the same conclusions.
 
 ## Remaining decisions to make together
 
