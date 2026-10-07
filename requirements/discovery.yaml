@@ -1,0 +1,133 @@
+# Requirements model; all controls remain unverified until evidence is supplied.
+---
+requirements:
+- id: REQ-009
+  title: Semantic requirement search
+  description: The system shall support fuzzy search of REQUIREMENT SPECIFICATIONs
+    via a SEMANTIC DECOMPOSITION, including discovering systems that implement a method
+    for moving water when described as pump, aqueduct, bucket, or equivalent terms.
+  refines:
+  - REQ-103
+  status: approved
+  tags:
+  - discovery
+  - initial
+- id: REQ-027
+  title: Rigor-aware semantic queries
+  description: The system shall support querying artifacts by achieved verification
+    rigor in combination with semantic requirement search, including finding smart
+    faucet designs supported by evidence of physical construction and testing while
+    excluding designs supported only by simulation; results shall expose which requirements
+    and design elements the qualifying evidence covers.
+  refines:
+  - REQ-103
+  status: approved
+  tags:
+  - discovery
+  - initial
+- id: REQ-031
+  title: Capabilities and constraints from design
+  description: A SEMANTIC DECOMPOSITION shall describe capabilities and constraints
+    extractable from the REQUIREMENT SPECIFICATION and the IMPLEMENTATION, including
+    capabilities and constraints inferred by examining the concrete design rather
+    than only its specification's terminology; the system shall support querying these
+    descriptions to discover equivalent capabilities and distinguish relevant constraints.
+  refines:
+  - REQ-103
+  status: approved
+  tags:
+  - discovery
+  - initial
+- id: REQ-032
+  title: Semantic revision history
+  description: The system shall permit revision of an artifact's SEMANTIC DECOMPOSITION
+    as model capability or understanding of capabilities and constraints improves;
+    each revision shall create a new REQUIREMENTS-TO-IMPLEMENTATION ARTIFACT containing
+    the updated decomposition and a predecessor reference to the previous artifact's
+    CONTENT ADDRESS, and shall compute a new CONTENT ADDRESS covering the updated
+    data and predecessor reference without modifying the previous artifact.
+  refines:
+  - REQ-103
+  status: approved
+  tags:
+  - discovery
+  - initial
+- id: REQ-033
+  title: Per-claim verification status
+  description: Each capability and constraint in an artifact's SEMANTIC DECOMPOSITION
+    shall expose a machine-readable verification status distinguishing evidence-supported
+    verification from inference without sufficient evidence; a verified capability
+    or constraint shall trace to passing, applicable evidence in the VERIFICATION
+    REPORT that covers the claim and its stated conditions, and shall expose the verification
+    method and achieved rigor.
+  refines:
+  - REQ-103
+  status: approved
+  tags:
+  - discovery
+  - initial
+- id: REQ-034
+  title: Visible and filterable claim verification
+  description: Browsing and semantic search results shall expose verification statuses
+    and evidence references for individual capabilities and constraints in their summaries
+    so agents can identify verified claims without inspecting the entire artifact;
+    the system shall support filtering by verified capabilities and constraints and
+    shall not infer verification of every semantic capability or constraint from an
+    artifact's overall fully verified status.
+  refines:
+  - REQ-103
+  status: approved
+  tags:
+  - discovery
+  - initial
+- id: REQ-035
+  title: Local and remote search scope
+  description: The system shall support semantic search of the local CACHE and configured
+    remote CACHEs, with a selectable search scope and results identifying the originating
+    CACHE and artifact CONTENT ADDRESS.
+  refines:
+  - REQ-103
+  status: approved
+  tags:
+  - discovery
+  - initial
+- id: REQ-047
+  title: Configurable version filtering
+  description: Browsing and search shall support an agent-configurable version filter,
+    preserving history and multiple branches. A conceptual predecessor link alone
+    shall not declare an artifact superseded; an explicit hashed revision relationship
+    shall distinguish successor versions from alternative designs or re-verification
+    reports. Results shall state the known CACHE/search scope of version conclusions.
+  refines:
+  - REQ-103
+  status: approved
+  tags:
+  - discovery
+  - initial
+- id: REQ-059
+  title: Scope-aware browsing
+  description: Browsing and search summaries shall expose the scope of verification
+    claims and support filtering by design, batch, or individual-unit verification,
+    subject to access restrictions; scope identifiers and evidence shall remain constituent
+    data of REQUIREMENTS-TO-IMPLEMENTATION ARTIFACTs covered by their CONTENT ADDRESSes
+    rather than additional first-class object types.
+  refines:
+  - REQ-103
+  status: approved
+  tags:
+  - discovery
+  - initial
+- id: REQ-064
+  title: Externally supplied semantic decomposition
+  description: The initial CACHE shall accept SEMANTIC DECOMPOSITIONs supplied by
+    external agents as constituent artifact data through its publication interface,
+    including revisions submitted as new artifacts under the existing history and
+    hashing rules; deployment shall not require CACHE-hosted decomposition generation
+    or a particular model provider, and supplied claims shall remain subject to the
+    evidence-based verification distinctions.
+  refines:
+  - REQ-103
+  status: approved
+  tags:
+  - discovery
+  - initial

@@ -1,0 +1,129 @@
+# Requirements model; all controls remain unverified until evidence is supplied.
+---
+requirements:
+- id: REQ-036
+  title: Separate disclosure scopes
+  description: The system shall support separately controlled access to an artifact's
+    published REQUIREMENT SPECIFICATION and semantic discovery data, requested verification
+    evidence or proofs, and concrete IMPLEMENTATION; public discovery shall not grant
+    access to restricted evidence or implementation content, including through direct
+    content-address retrieval or remote CACHE substitution.
+  refines:
+  - REQ-105
+  status: approved
+  tags:
+  - access
+  - initial
+- id: REQ-052
+  title: Mutable access policy
+  description: Access grants and revocations shall be mutable CACHE configuration
+    associated with requester identities and artifact CONTENT ADDRESSes rather than
+    constituent artifact data or additional first-class database objects; changing
+    access permissions shall not modify the artifact, its publisher identity, or its
+    CONTENT ADDRESS.
+  refines:
+  - REQ-105
+  status: approved
+  tags:
+  - access
+  - initial
+- id: REQ-053
+  title: Access sales and revocation limits
+  description: The system shall enforce access grants and revocations on subsequent
+    evidence and know-how requests while supporting the sale of physical articles
+    separately from access to knowledge; no transaction shall be represented as ownership
+    of the ideas. Revocation shall not claim to erase content or keys already delivered.
+  refines:
+  - REQ-105
+  status: approved
+  tags:
+  - access
+  - initial
+- id: REQ-069
+  title: Exact-hash grants
+  description: Each access grant shall identify a specific artifact CONTENT ADDRESS
+    and access scope; a grant for one artifact shall not automatically authorize any
+    predecessor, descendant, alternative version, or dependency.
+  refines:
+  - REQ-105
+  status: approved
+  tags:
+  - access
+  - initial
+- id: REQ-071
+  title: Public-key requester identity
+  description: Public keys or unambiguous key identifiers shall identify requesters.
+    Protected requests shall authenticate by signatures without a required central
+    account service; grants, purchases, and upgrade eligibility shall bind to the
+    authenticated key identity.
+  refines:
+  - REQ-105
+  status: approved
+  tags:
+  - access
+  - initial
+- id: REQ-072
+  title: Bound signed requests and replay protection
+  description: Signed-request authentication shall bind the request's operation, target
+    CACHE, artifact and access scope where applicable, and request content, and shall
+    include freshness and replay protection; the CACHE shall reject altered, invalid,
+    or replayed authentication rather than authorize actions solely from possession
+    of a public key or purchaser identifier.
+  refines:
+  - REQ-105
+  status: approved
+  tags:
+  - access
+  - initial
+- id: REQ-073
+  title: Encrypted syndication
+  description: CACHEs shall be able to distribute encrypted artifact sections without
+    granting plaintext access; syndicated discovery shall identify the final artifact
+    address, encrypted sections, and controlling authority/CACHE. Key and access-payment
+    requests shall be routed to that controlling CACHE rather than implicitly granting
+    distributor authority.
+  refines:
+  - REQ-105
+  status: approved
+  tags:
+  - access
+  - initial
+- id: REQ-074
+  title: Controlling CACHE key authority
+  description: The controlling CACHE shall authorize decryption-key release to the
+    authenticated requester for an exact artifact and scope after payment clearance
+    or explicit eligibility approval; serving ciphertext shall confer no authority
+    to release keys or grant plaintext access.
+  refines:
+  - REQ-105
+  status: approved
+  tags:
+  - access
+  - initial
+- id: REQ-075
+  title: Committed encrypted and plaintext content
+  description: The payload shall commit to encrypted section bytes and public encryption
+    parameters, and to the exact plaintext content they represent using a binding
+    commitment suitable for restricted content. Recipients shall validate ciphertext
+    against the artifact and, after decryption, validate the committed plaintext.
+    Private keys remain protected operational secrets. Published encrypted section
+    bytes are immutable; re-encryption changes the artifact hash.
+  refines:
+  - REQ-105
+  status: approved
+  tags:
+  - access
+  - initial
+- id: REQ-076
+  title: Independent evidence and know-how keys
+  description: The system shall support separate encryption scopes and independently
+    released decryption keys for verification reports and evidence versus concrete
+    design and manufacturing know-how; authorizing or decrypting one scope shall not
+    unlock the other, and payment requests, grants, and key release shall identify
+    the exact artifact CONTENT ADDRESS and authorized scope.
+  refines:
+  - REQ-105
+  status: approved
+  tags:
+  - access
+  - initial

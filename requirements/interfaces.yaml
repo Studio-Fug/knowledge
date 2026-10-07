@@ -1,0 +1,62 @@
+# Requirements model; all controls remain unverified until evidence is supplied.
+---
+requirements:
+- id: REQ-005
+  title: Content-addressed build dependencies
+  description: An IMPLEMENTATION may reference other IMPLEMENTATIONs by their CONTENT
+    ADDRESSes; the system shall expand these references, where necessary, into build
+    system relationships (such as Bazel MODULE dependencies).
+  refines:
+  - REQ-107
+  status: approved
+  tags:
+  - interfaces
+  - initial
+- id: REQ-043
+  title: Initial Bazel and Nix support
+  description: The system shall initially support Bazel and Nix integration for expanding
+    content-addressed implementation dependencies into the relationships required
+    by those systems; other build systems are outside the initial integration scope.
+  refines:
+  - REQ-107
+  status: approved
+  tags:
+  - interfaces
+  - initial
+- id: REQ-044
+  title: Build-independent dependency relationships
+  description: Artifact dependency relationships shall identify referenced artifacts
+    by CONTENT ADDRESS independently of build-system-specific integration data, so
+    support for additional build systems can be added without replacing the artifact
+    dependency model; integration data stored in an artifact shall remain covered
+    by its CONTENT ADDRESS.
+  refines:
+  - REQ-107
+  status: approved
+  tags:
+  - interfaces
+  - initial
+- id: REQ-060
+  title: Agent API and CLI first
+  description: The system shall initially provide an agent-friendly API and CLI with
+    machine-readable inputs, results, verification summaries, and errors for its supported
+    use cases; the API shall expose the operations needed by both agent and human
+    clients without requiring a graphical interface.
+  refines:
+  - REQ-107
+  status: approved
+  tags:
+  - interfaces
+  - initial
+- id: REQ-061
+  title: Human browser in this repository
+  description: A subsequent human browser shall be maintained in this repository and
+    use the same API and authorization model as agents for all supported use cases,
+    including commercial access requests; it shall introduce neither browser-only
+    core operations nor new artifact types.
+  refines:
+  - REQ-107
+  status: approved
+  tags:
+  - interfaces
+  - later

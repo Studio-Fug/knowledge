@@ -1,0 +1,710 @@
+# Requirements model; all controls remain unverified until evidence is supplied.
+---
+risks:
+- id: RISK-001
+  title: Fabricated verification and fake independence
+  hazard: A publisher or colluding reviewers forge measurements, videos, reports,
+    or identities.
+  hazardous_situation: A signed plausible report or many aliases are interpreted as
+    proof a real test occurred.
+  harm: Unsafe purchase or reuse, wasted money, and loss of marketplace trust.
+  severity: critical
+  likelihood: likely
+  status: proposed
+  residual: Not accepted or quantitatively assessed; controls are proposed and unverified.
+    Source truth and collusion remain unresolved; cryptography and reproduction hooks
+    do not prove physical events.
+- id: RISK-002
+  title: Overstated rigor and physical scope
+  hazard: A seller advertises simulation as physical testing or selected units as
+    a verified batch/design.
+  hazardous_situation: A requester infers blanket suitability from a passing status
+    or cherry-picked demonstration.
+  harm: Unverified units or assemblies are used outside established conditions.
+  severity: critical
+  likelihood: likely
+  status: proposed
+  residual: Not accepted or quantitatively assessed; controls are proposed and unverified.
+    Sampling validity and adequacy of domain-specific tests still need expert judgment.
+- id: RISK-003
+  title: Evidence laundering and stale reuse
+  hazard: Passing evidence from another specification, revision, environment, or unit
+    is reused without applicable traceability.
+  hazardous_situation: Repackaged evidence fills a requirement mechanically while
+    testing the wrong subject.
+  harm: False full-verification status and unsuitable designs or physical products.
+  severity: critical
+  likelihood: likely
+  status: proposed
+  residual: Not accepted or quantitatively assessed; controls are proposed and unverified.
+    Exact matching does not by itself establish that a procedure adequately tests
+    its requirement.
+- id: RISK-004
+  title: Counterfeit identity and artifact substitution
+  hazard: A cache or attacker substitutes content, spoofs identities, or exploits
+    ambiguous serialization.
+  hazardous_situation: A requester accepts an artifact or signature for a different
+    subject or publisher.
+  harm: Malicious substitution and loss of traceability or access entitlements.
+  severity: high
+  likelihood: possible
+  status: proposed
+  residual: Not accepted or quantitatively assessed; controls are proposed and unverified.
+    Compromised genuine signing keys and misleading real-world identity claims remain
+    possible.
+- id: RISK-005
+  title: Restricted knowledge and purchaser privacy leakage
+  hazard: Unauthorized parties exploit discovery, partial responses, low-entropy hashes,
+    logs, or permissive grants.
+  hazardous_situation: Evidence or know-how and purchase identity leak beyond an authorized
+    scope.
+  harm: Commercial loss, privacy loss, and disclosure that cannot be recalled.
+  severity: high
+  likelihood: likely
+  status: proposed
+  residual: Not accepted or quantitatively assessed; controls are proposed and unverified.
+    Published semantic data itself can reveal know-how; authorized buyers can retain
+    or redistribute plaintext.
+- id: RISK-006
+  title: Private-key theft and irreversible key release
+  hazard: Requester, publisher, or controlling-cache private keys are stolen or misdelivered.
+  hazardous_situation: An attacker signs as a participant, unlocks content, or keeps
+    a previously valid decryption key.
+  harm: Impersonation, unauthorized content access, and unrecoverable confidentiality
+    loss.
+  severity: high
+  likelihood: possible
+  status: proposed
+  residual: Not accepted or quantitatively assessed; controls are proposed and unverified.
+    Revocation cannot erase released keys or plaintext; operational compromise needs
+    response procedures.
+- id: RISK-007
+  title: Payment and upgrade cheating
+  hazard: A requester forges clearance, replays callbacks, swaps scope, or exploits
+    an upgrade policy.
+  hazardous_situation: The host grants unpaid access or charges/fulfills the wrong
+    request more than once.
+  harm: Revenue loss, unauthorized keys, or customer double charging.
+  severity: high
+  likelihood: likely
+  status: proposed
+  residual: Not accepted or quantitatively assessed; controls are proposed and unverified.
+    The host's payment provider, settlement definition, refunds, and commercial disputes
+    remain external.
+- id: RISK-008
+  title: Prompt injection and active content
+  hazard: Artifact prose or remote results contain instructions targeting agents or
+    executable browser content.
+  hazardous_situation: A client treats publisher content as authority to spend, disclose
+    secrets, or change policy.
+  harm: Exfiltration, unauthorized purchases, and corrupted client decisions.
+  severity: high
+  likelihood: likely
+  status: proposed
+  residual: Not accepted or quantitatively assessed; controls are proposed and unverified.
+    Agent isolation and instruction handling remain client responsibilities; labels
+    and escaping are incomplete defenses.
+- id: RISK-009
+  title: Malicious designs and reproduction commands
+  hazard: Bazel/Nix expressions, source code, archive paths, or SOP commands execute
+    hostile actions.
+  hazardous_situation: Ingestion or reproduction executes attacker-controlled content
+    with host or requester privileges.
+  harm: Host compromise, data loss, and secret theft.
+  severity: critical
+  likelihood: possible
+  status: proposed
+  residual: Not accepted or quantitatively assessed; controls are proposed and unverified.
+    Sandbox escape and toolchain compromise remain risks; no host execution is required
+    for ordinary browsing.
+- id: RISK-010
+  title: Resource exhaustion and remote-fetch abuse
+  hazard: Mass publication, oversized archives, cyclic references, remote fan-out,
+    or attacker-selected URLs consume resources.
+  hazardous_situation: A cache follows unbounded work or fetches internal services
+    or credentialed endpoints.
+  harm: Service denial, host costs, internal-network access, and corrupted availability.
+  severity: high
+  likelihood: likely
+  status: proposed
+  residual: Not accepted or quantitatively assessed; controls are proposed and unverified.
+    Rate limits can be evaded by identities; suitable quotas require observed workloads.
+- id: RISK-011
+  title: Search poisoning and incomplete federation
+  hazard: A remote cache fabricates labels, suppresses results, or presents a partial
+    view as exhaustive.
+  hazardous_situation: An agent selects on unverified claims or assumes no contrary
+    evidence exists.
+  harm: Misleading purchases and concealed verification gaps.
+  severity: high
+  likelihood: likely
+  status: proposed
+  residual: Not accepted or quantitatively assessed; controls are proposed and unverified.
+    Hosts control their published and served views; global completeness is not guaranteed.
+- id: RISK-012
+  title: Review sabotage, sybils, and censorship
+  hazard: Competitors submit misleading failures, create many reviewers, or suppress
+    inconvenient reproductions.
+  hazardous_situation: Report counts or purchase badges override attributable procedures
+    and evidence.
+  harm: False reputation, hidden defects, and unfair exclusion.
+  severity: high
+  likelihood: likely
+  status: proposed
+  residual: Not accepted or quantitatively assessed; controls are proposed and unverified.
+    Independence and reproduction fidelity are suspect; no reputation/consensus scheme
+    is accepted yet.
+- id: RISK-013
+  title: Circular or misbound proof and encryption
+  hazard: Reports name their own enclosing hash, ciphertext is not committed, or partial
+    data is asserted as fully validated.
+  hazardous_situation: Proof or decryption succeeds for content not bound to the purchased
+    artifact.
+  harm: Integrity failure, impossible verification, or undisclosed content accepted
+    as checked.
+  severity: high
+  likelihood: possible
+  status: proposed
+  residual: Not accepted or quantitatively assessed; controls are proposed and unverified.
+    Commitment and proof construction require cryptographic review before release;
+    ZKP guarantees remain unspecified.
+- id: RISK-014
+  title: Local corruption and inconsistent operational state
+  hazard: Crash, disk corruption, or concurrency loses artifacts, replay state, payment
+    events, or grants.
+  hazardous_situation: The cache exposes partial objects or disagrees with an already
+    cleared transaction.
+  harm: Availability loss, repeated charges, unpaid release, or inconsistent entitlement.
+  severity: high
+  likelihood: possible
+  status: proposed
+  residual: Not accepted or quantitatively assessed; controls are proposed and unverified.
+    Backup key security, disaster recovery, and payment-provider reconciliation need
+    operational testing.
+- id: RISK-015
+  title: Stolen know-how, harmful publication, and resale
+  hazard: A publisher uploads others' restricted designs or dangerous material; a
+    buyer redistributes decrypted content.
+  hazardous_situation: A host becomes a distribution route for abuse despite valid
+    signatures and hashes.
+  harm: Commercial or personal harm, misuse of designs, and trust loss.
+  severity: high
+  likelihood: possible
+  status: proposed
+  residual: Not accepted or quantitatively assessed; controls are proposed and unverified.
+    No automated rights/truth determination or DRM promise; host handling policies
+    remain to be developed.
+- id: RISK-016
+  title: False lineage and upgrade hijacking
+  hazard: An attacker names a popular artifact as a predecessor, claims supersession,
+    or substitutes an upgrade/key authority.
+  hazardous_situation: Search hides the original or a buyer sends payment to a counterfeit
+    controller.
+  harm: Misattributed contribution, fraud, or selection of an unwanted successor.
+  severity: high
+  likelihood: likely
+  status: proposed
+  residual: Not accepted or quantitatively assessed; controls are proposed and unverified.
+    Signatures bind assertions but do not prove conceptual contribution; identity
+    continuity needs policy.
+mitigations:
+- id: MIT-001
+  title: Evidence status cannot be self-certified
+  description: The CACHE shall distinguish publisher-reported completeness, structurally
+    checked coverage, signature validity, and requester-checked claims in machine-readable
+    summaries. Unavailable evidence shall be unknown to the requester; a submitted
+    VERIFIED label, signed assertion, or valid hash alone shall not establish independently
+    checked verification. Reuse shall require a named evidence-check or explicitly
+    selected publisher-trust policy rather than silently equating reported and checked
+    status.
+  type: protective
+  mitigates:
+  - RISK-001
+  implemented_by:
+  - REQ-079
+  status: proposed
+- id: MIT-002
+  title: Unambiguous integrity and partial disclosure
+  description: The system shall define versioned deterministic serialization and reject
+    duplicate or ambiguous fields, invalid hashes, unsafe paths, and conflicting section
+    descriptors. Partial disclosures shall include sufficient binding data to identify
+    the final artifact and disclosed sections, expose uncheckable commitments, and
+    never masquerade as complete validated artifacts.
+  type: protective
+  mitigates:
+  - RISK-004
+  - RISK-013
+  implemented_by:
+  - REQ-080
+  status: proposed
+- id: MIT-003
+  title: Minimized public disclosure
+  description: Discovery, exports, error messages, logs, and partial responses shall
+    disclose only data authorized for the requested scope. Public commitments to restricted
+    content shall avoid exposing low-entropy plaintext through guessable unsalted
+    hashes; public specifications and semantic labels shall be treated as deliberate
+    disclosures whose leakage cannot be undone.
+  type: protective
+  mitigates:
+  - RISK-005
+  implemented_by:
+  - REQ-081
+  status: proposed
+- id: MIT-004
+  title: Protected key delivery
+  description: Private signing and decryption keys shall remain protected operational
+    secrets and shall not appear in public artifacts, logs, or search data. Key release
+    shall use an authenticated confidential channel bound to requester, exact artifact,
+    and scope. Known unauthorized or revoked future access shall be denied, without
+    claiming to revoke plaintext or keys already delivered.
+  type: protective
+  mitigates:
+  - RISK-005
+  - RISK-006
+  implemented_by:
+  - REQ-082
+  status: proposed
+- id: MIT-005
+  title: Authenticated and durable payment transitions
+  description: Only the configured host integration or explicitly authorized eligibility
+    policy shall confirm clearance or payment bypass. State transitions shall bind
+    request identity and quoted terms, authenticate callbacks, reject mismatches and
+    unauthorized transitions, persist clearance and grants, and handle retries, concurrent
+    updates, out-of-order notifications, and restart without duplicate fulfillment
+    or false clearance.
+  type: protective
+  mitigates:
+  - RISK-007
+  - RISK-014
+  implemented_by:
+  - REQ-083
+  status: proposed
+- id: MIT-006
+  title: Untrusted content is data
+  description: APIs shall identify artifact text, reports, labels, predecessor notes,
+    and remote search results as untrusted publisher content distinct from protocol
+    operations. Stored content shall not cause automatic payment, key release, configuration
+    changes, tool execution, or navigation; the later browser shall render it inertly
+    and prevent active-content execution. Client guidance shall describe prompt-injection
+    risks without claiming that labeling makes agents immune.
+  type: information
+  mitigates:
+  - RISK-008
+  implemented_by:
+  - REQ-084
+  status: proposed
+- id: MIT-007
+  title: Explicit isolated reproduction
+  description: The CACHE shall not execute uploaded designs, SOP commands, Bazel rules,
+    Nix expressions, or tests merely to ingest, browse, or classify an artifact. Reproduction
+    shall require an explicit authorized operation in an isolated environment with
+    restricted secrets and host access, recorded tools and conditions, and bounded
+    resources; unknown or unsupported isolation shall fail closed for execution.
+  type: protective
+  mitigates:
+  - RISK-009
+  implemented_by:
+  - REQ-085
+  status: proposed
+- id: MIT-008
+  title: Bounded ingestion and remote work
+  description: Hosts shall be able to enforce limits on publication, input and expanded
+    sizes, nesting, graph traversal, storage, concurrency, search fan-out, downloads,
+    and timeouts. Server-side remote fetches shall use host-approved destinations
+    and redirect policy, shall not let artifact content select arbitrary destinations,
+    and shall not forward requester secrets or signatures to unintended hosts.
+  type: protective
+  mitigates:
+  - RISK-010
+  implemented_by:
+  - REQ-086
+  status: proposed
+- id: MIT-009
+  title: Honest federated results and lineage
+  description: Search and history responses shall identify sources, pagination, errors,
+    unavailable caches, applied filters, and the known scope of completeness. Remote
+    labels shall not silently satisfy locally checked verification filters. Alternatives
+    and reproduction reports shall not hide an original as superseded merely by naming
+    it as a predecessor; indexes shall be rebuildable from immutable artifacts.
+  type: protective
+  mitigates:
+  - RISK-011
+  - RISK-016
+  implemented_by:
+  - REQ-087
+  status: proposed
+- id: MIT-010
+  title: Attributed reproduction without vote counting
+  description: Re-verification contributions shall be signed and identify the reporter's
+    claimed relationship to the producer, any disclosed incentive or purchase basis,
+    tested subject and reproduction deviations. Conflicting reports shall remain attributable
+    and discoverable under applicable publication and access policy; report count,
+    video format, purchase history, or claimed independence shall not alone establish
+    credibility or override original evidence.
+  type: information
+  mitigates:
+  - RISK-001
+  - RISK-012
+  implemented_by:
+  - REQ-088
+  status: proposed
+- id: MIT-011
+  title: Durable artifact and operational state
+  description: Local publication shall be atomic and reject corrupt content rather
+    than expose a partially written object as valid. The CACHE shall recover consistent
+    grants, payment state, and replay protection after interruption, protect operational
+    state permissions, and provide a documented backup and recovery procedure for
+    artifacts and operational secrets without embedding secrets in public exports.
+  type: protective
+  mitigates:
+  - RISK-014
+  implemented_by:
+  - REQ-089
+  status: proposed
+- id: MIT-012
+  title: Host abuse handling with explicit limits
+  description: Hosts shall be able to restrict publication, rate-limit or quarantine
+    abusive submissions, remove local availability or discovery listings, and revoke
+    future grants through authenticated administration. Such actions shall not rewrite
+    immutable artifact bytes or claim global deletion. The service shall expose an
+    abuse-reporting route; it shall not promise prevention of plaintext redistribution,
+    stolen know-how publication, or harmful design misuse.
+  type: protective
+  mitigates:
+  - RISK-012
+  - RISK-015
+  implemented_by:
+  - REQ-090
+  status: proposed
+- id: MIT-013
+  title: Signing context and identity lifecycle
+  description: Signatures shall bind protocol purpose, representation version, relevant
+    key identity, target CACHE for requests, and request freshness. Unsupported algorithms,
+    invalid signatures, and ambiguous identities shall fail closed. Administrative
+    key revocation and recovery shall require an explicitly configured authority;
+    changing keys shall not silently inherit another key's purchases or rewrite historical
+    signatures.
+  type: protective
+  mitigates:
+  - RISK-004
+  - RISK-006
+  - RISK-016
+  implemented_by:
+  - REQ-091
+  status: proposed
+- id: MIT-014
+  title: Evidence applicability and honest scope
+  description: Evidence links shall identify exact specification and design or physical
+    subject, requirement or claim, procedure, conditions, units or batch, result,
+    and rigor. Screening reports shall state rejected outcomes and the selection or
+    sampling basis relevant to their claims. Reuse and scope filters shall reject
+    mismatched or insufficient evidence rather than extrapolate from selected units,
+    simulation, or another design by default.
+  type: protective
+  mitigates:
+  - RISK-002
+  - RISK-003
+  implemented_by:
+  - REQ-092
+  status: proposed
+- id: MIT-015
+  title: Acyclic cryptographic binding
+  description: The signed payload shall commit to precomputed section ciphertext and
+    public encryption parameters; encryption and embedded report signatures shall
+    bind a verification-subject or section commitment that does not contain their
+    own output. The complete artifact and publisher signature shall be hashed last,
+    and external responses shall name its final address. Changed ciphertext, report,
+    or signature shall create a new address; private key wrapping and access policy
+    remain operational state.
+  type: protective
+  mitigates:
+  - RISK-013
+  implemented_by:
+  - REQ-093
+  status: proposed
+- id: MIT-016
+  title: Protected host policy boundary
+  description: Grant, payment-integration, upgrade, publication, and remote-destination
+    configuration shall be changed only by authorized host administration. Artifact
+    authorship, search content, or possession of a content address shall confer no
+    administrative privileges. Decision records shall identify the requester, exact
+    artifact and scope, policy or adapter revision, and outcome without logging private
+    keys, enabling access-decision audit independently of immutable artifact lineage.
+  type: protective
+  mitigates:
+  - RISK-005
+  - RISK-007
+  - RISK-008
+  implemented_by:
+  - REQ-094
+  status: proposed
+requirements:
+- id: REQ-079
+  title: Evidence status cannot be self-certified
+  description: The CACHE shall distinguish publisher-reported completeness, structurally
+    checked coverage, signature validity, and requester-checked claims in machine-readable
+    summaries. Unavailable evidence shall be unknown to the requester; a submitted
+    VERIFIED label, signed assertion, or valid hash alone shall not establish independently
+    checked verification. Reuse shall require a named evidence-check or explicitly
+    selected publisher-trust policy rather than silently equating reported and checked
+    status.
+  satisfies:
+  - UN-004
+  method: TM-002
+  status: proposed
+  tags:
+  - risk-control
+  - initial
+- id: REQ-080
+  title: Unambiguous integrity and partial disclosure
+  description: The system shall define versioned deterministic serialization and reject
+    duplicate or ambiguous fields, invalid hashes, unsafe paths, and conflicting section
+    descriptors. Partial disclosures shall include sufficient binding data to identify
+    the final artifact and disclosed sections, expose uncheckable commitments, and
+    never masquerade as complete validated artifacts.
+  satisfies:
+  - UN-004
+  method: TM-001
+  status: proposed
+  tags:
+  - risk-control
+  - initial
+- id: REQ-081
+  title: Minimized public disclosure
+  description: Discovery, exports, error messages, logs, and partial responses shall
+    disclose only data authorized for the requested scope. Public commitments to restricted
+    content shall avoid exposing low-entropy plaintext through guessable unsalted
+    hashes; public specifications and semantic labels shall be treated as deliberate
+    disclosures whose leakage cannot be undone.
+  satisfies:
+  - UN-004
+  method: TM-003
+  status: proposed
+  tags:
+  - risk-control
+  - initial
+- id: REQ-082
+  title: Protected key delivery
+  description: Private signing and decryption keys shall remain protected operational
+    secrets and shall not appear in public artifacts, logs, or search data. Key release
+    shall use an authenticated confidential channel bound to requester, exact artifact,
+    and scope. Known unauthorized or revoked future access shall be denied, without
+    claiming to revoke plaintext or keys already delivered.
+  satisfies:
+  - UN-004
+  method: TM-003
+  status: proposed
+  tags:
+  - risk-control
+  - initial
+- id: REQ-083
+  title: Authenticated and durable payment transitions
+  description: Only the configured host integration or explicitly authorized eligibility
+    policy shall confirm clearance or payment bypass. State transitions shall bind
+    request identity and quoted terms, authenticate callbacks, reject mismatches and
+    unauthorized transitions, persist clearance and grants, and handle retries, concurrent
+    updates, out-of-order notifications, and restart without duplicate fulfillment
+    or false clearance.
+  satisfies:
+  - UN-004
+  method: TM-004
+  status: proposed
+  tags:
+  - risk-control
+  - initial
+- id: REQ-084
+  title: Untrusted content is data
+  description: APIs shall identify artifact text, reports, labels, predecessor notes,
+    and remote search results as untrusted publisher content distinct from protocol
+    operations. Stored content shall not cause automatic payment, key release, configuration
+    changes, tool execution, or navigation; the later browser shall render it inertly
+    and prevent active-content execution. Client guidance shall describe prompt-injection
+    risks without claiming that labeling makes agents immune.
+  satisfies:
+  - UN-004
+  method: TM-003
+  status: proposed
+  tags:
+  - risk-control
+  - initial
+  - later-browser
+- id: REQ-085
+  title: Explicit isolated reproduction
+  description: The CACHE shall not execute uploaded designs, SOP commands, Bazel rules,
+    Nix expressions, or tests merely to ingest, browse, or classify an artifact. Reproduction
+    shall require an explicit authorized operation in an isolated environment with
+    restricted secrets and host access, recorded tools and conditions, and bounded
+    resources; unknown or unsupported isolation shall fail closed for execution.
+  satisfies:
+  - UN-004
+  method: TM-003
+  status: proposed
+  tags:
+  - risk-control
+  - initial
+- id: REQ-086
+  title: Bounded ingestion and remote work
+  description: Hosts shall be able to enforce limits on publication, input and expanded
+    sizes, nesting, graph traversal, storage, concurrency, search fan-out, downloads,
+    and timeouts. Server-side remote fetches shall use host-approved destinations
+    and redirect policy, shall not let artifact content select arbitrary destinations,
+    and shall not forward requester secrets or signatures to unintended hosts.
+  satisfies:
+  - UN-004
+  method: TM-003
+  status: proposed
+  tags:
+  - risk-control
+  - initial
+- id: REQ-087
+  title: Honest federated results and lineage
+  description: Search and history responses shall identify sources, pagination, errors,
+    unavailable caches, applied filters, and the known scope of completeness. Remote
+    labels shall not silently satisfy locally checked verification filters. Alternatives
+    and reproduction reports shall not hide an original as superseded merely by naming
+    it as a predecessor; indexes shall be rebuildable from immutable artifacts.
+  satisfies:
+  - UN-004
+  method: TM-002
+  status: proposed
+  tags:
+  - risk-control
+  - initial
+- id: REQ-088
+  title: Attributed reproduction without vote counting
+  description: Re-verification contributions shall be signed and identify the reporter's
+    claimed relationship to the producer, any disclosed incentive or purchase basis,
+    tested subject and reproduction deviations. Conflicting reports shall remain attributable
+    and discoverable under applicable publication and access policy; report count,
+    video format, purchase history, or claimed independence shall not alone establish
+    credibility or override original evidence.
+  satisfies:
+  - UN-004
+  method: TM-002
+  status: proposed
+  tags:
+  - risk-control
+  - initial
+- id: REQ-089
+  title: Durable artifact and operational state
+  description: Local publication shall be atomic and reject corrupt content rather
+    than expose a partially written object as valid. The CACHE shall recover consistent
+    grants, payment state, and replay protection after interruption, protect operational
+    state permissions, and provide a documented backup and recovery procedure for
+    artifacts and operational secrets without embedding secrets in public exports.
+  satisfies:
+  - UN-004
+  method: TM-005
+  status: proposed
+  tags:
+  - risk-control
+  - initial
+- id: REQ-090
+  title: Host abuse handling with explicit limits
+  description: Hosts shall be able to restrict publication, rate-limit or quarantine
+    abusive submissions, remove local availability or discovery listings, and revoke
+    future grants through authenticated administration. Such actions shall not rewrite
+    immutable artifact bytes or claim global deletion. The service shall expose an
+    abuse-reporting route; it shall not promise prevention of plaintext redistribution,
+    stolen know-how publication, or harmful design misuse.
+  satisfies:
+  - UN-004
+  method: TM-003
+  status: proposed
+  tags:
+  - risk-control
+  - initial
+- id: REQ-091
+  title: Signing context and identity lifecycle
+  description: Signatures shall bind protocol purpose, representation version, relevant
+    key identity, target CACHE for requests, and request freshness. Unsupported algorithms,
+    invalid signatures, and ambiguous identities shall fail closed. Administrative
+    key revocation and recovery shall require an explicitly configured authority;
+    changing keys shall not silently inherit another key's purchases or rewrite historical
+    signatures.
+  satisfies:
+  - UN-004
+  method: TM-001
+  status: proposed
+  tags:
+  - risk-control
+  - initial
+- id: REQ-092
+  title: Evidence applicability and honest scope
+  description: Evidence links shall identify exact specification and design or physical
+    subject, requirement or claim, procedure, conditions, units or batch, result,
+    and rigor. Screening reports shall state rejected outcomes and the selection or
+    sampling basis relevant to their claims. Reuse and scope filters shall reject
+    mismatched or insufficient evidence rather than extrapolate from selected units,
+    simulation, or another design by default.
+  satisfies:
+  - UN-004
+  method: TM-002
+  status: proposed
+  tags:
+  - risk-control
+  - initial
+- id: REQ-093
+  title: Acyclic cryptographic binding
+  description: The signed payload shall commit to precomputed section ciphertext and
+    public encryption parameters; encryption and embedded report signatures shall
+    bind a verification-subject or section commitment that does not contain their
+    own output. The complete artifact and publisher signature shall be hashed last,
+    and external responses shall name its final address. Changed ciphertext, report,
+    or signature shall create a new address; private key wrapping and access policy
+    remain operational state.
+  satisfies:
+  - UN-004
+  method: TM-001
+  status: proposed
+  tags:
+  - risk-control
+  - initial
+- id: REQ-094
+  title: Protected host policy boundary
+  description: Grant, payment-integration, upgrade, publication, and remote-destination
+    configuration shall be changed only by authorized host administration. Artifact
+    authorship, search content, or possession of a content address shall confer no
+    administrative privileges. Decision records shall identify the requester, exact
+    artifact and scope, policy or adapter revision, and outcome without logging private
+    keys, enabling access-decision audit independently of immutable artifact lineage.
+  satisfies:
+  - UN-004
+  method: TM-003
+  status: proposed
+  tags:
+  - risk-control
+  - initial
+test_methods:
+- id: TM-001
+  title: Cryptographic binding and serialization tests
+  level: simulation
+  procedure: Use valid and tampered fixtures, wrong keys, changed ciphertext and metadata,
+    canonicalization ambiguity, wrong contexts, partial disclosure, and self-reference
+    cases. Assert address/signature correctness or explicit rejection; do not infer
+    physical truth.
+- id: TM-002
+  title: Traceability and discovery scenario tests
+  level: simulation
+  procedure: Exercise complete, incomplete, failed, inaccessible, reused, and mismatched
+    evidence, per-claim scope/rigor, contradictory reports, revision versus conceptual
+    ancestry, and remote partial results. Check exact status and trace outputs.
+- id: TM-003
+  title: Adversarial authorization and resource tests
+  level: simulation
+  procedure: Test scope-separated keys, unauthorized actors, prompt/HTML inputs, malicious
+    archives/build expressions, replay, host policy changes, logs, quotas, fetch targets,
+    and redirects. Assert no unintended execution, disclosure, administration, or
+    outbound secret forwarding.
+- id: TM-004
+  title: Payment workflow state-machine tests
+  level: simulation
+  procedure: Use a fake host adapter to inject forged, duplicate, concurrent, stale,
+    mismatched, out-of-order and cleared callbacks plus explicit upgrade approvals.
+    Restart between transitions and check payment status, grant, and key-release invariants.
+- id: TM-005
+  title: Storage recovery fault-injection tests
+  level: simulation
+  procedure: Interrupt writes and state transitions, corrupt stored bytes, exhaust
+    capacity, and restore backups. Assert atomic publication, rejected corruption,
+    preserved cleared requests and grants, and protected secrets.

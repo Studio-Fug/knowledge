@@ -1,0 +1,207 @@
+# Requirements model; all controls remain unverified until evidence is supplied.
+---
+requirements:
+- id: REQ-001
+  title: Specification-to-implementation mapping
+  description: The system shall implement a database mapping REQUIREMENT SPECIFICATIONs
+    to IMPLEMENTATIONs.
+  refines:
+  - REQ-101
+  status: approved
+  tags:
+  - artifacts
+  - initial
+- id: REQ-002
+  title: Design and verification report
+  description: An IMPLEMENTATION shall contain a concrete design (source code, PCB
+    layouts, etc.), together with a VERIFICATION REPORT.
+  refines:
+  - REQ-101
+  status: approved
+  tags:
+  - artifacts
+  - initial
+- id: REQ-004
+  title: SHA-256 content addresses
+  description: Every entry in the database shall have a CONTENT ADDRESS (SHA-256).
+  refines:
+  - REQ-101
+  status: approved
+  tags:
+  - artifacts
+  - initial
+- id: REQ-014
+  title: Complete artifact hash coverage
+  description: The system shall compute a REQUIREMENTS-TO-IMPLEMENTATION ARTIFACT's
+    CONTENT ADDRESS as the SHA-256 of its complete deterministic representation, covering
+    its payload manifest and any publisher signature and signing metadata; the payload
+    shall cover its REQUIREMENT SPECIFICATION, concrete design files, VERIFICATION
+    REPORT and evidence, SEMANTIC DECOMPOSITION, implementation dependencies, version-history
+    predecessors, and display-only predecessor explanations, with referenced artifacts
+    identified by their final CONTENT ADDRESSes.
+  refines:
+  - REQ-101
+  status: approved
+  tags:
+  - artifacts
+  - initial
+- id: REQ-015
+  title: Immutable artifact revisions
+  description: Database objects shall be immutable; changes to evidence, features,
+    requirements, or composition shall produce a distinct object with a new CONTENT
+    ADDRESS without modifying the previous object.
+  refines:
+  - REQ-101
+  status: approved
+  tags:
+  - artifacts
+  - initial
+- id: REQ-016
+  title: Multiple conceptual predecessors
+  description: Each derived version of a database object shall record the CONTENT
+    ADDRESSes of one or more predecessor objects that contributed conceptually to
+    its production, and shall include all of those addresses in the content used to
+    compute its own CONTENT ADDRESS, forming an explicit traversable provenance graph;
+    an initial object with no predecessors shall record an empty predecessor set.
+  refines:
+  - REQ-101
+  status: approved
+  tags:
+  - artifacts
+  - initial
+- id: REQ-017
+  title: Non-authoritative predecessor explanations
+  description: Each predecessor link shall carry a hashed human-readable contribution
+    explanation labeled display-only and non-authoritative; it shall not establish
+    verification status, dependencies, or factual lineage by itself.
+  refines:
+  - REQ-101
+  status: approved
+  tags:
+  - artifacts
+  - initial
+- id: REQ-018
+  title: Inspectable provenance sources
+  description: Provenance interfaces shall expose the linked specifications, implementations,
+    and semantic decompositions so agents can derive lineage conclusions from the
+    underlying artifacts rather than treating predecessor explanations as authoritative
+    evidence.
+  refines:
+  - REQ-101
+  status: approved
+  tags:
+  - artifacts
+  - initial
+- id: REQ-019
+  title: No unhashed artifact metadata
+  description: Every bit of stored data belonging to a database object shall be covered
+    by its CONTENT ADDRESS, directly or through content-addressed references; no object
+    metadata, including display-only or non-authoritative data, shall exist outside
+    that coverage, and changing any such data shall produce a distinct object with
+    a new CONTENT ADDRESS.
+  refines:
+  - REQ-101
+  status: approved
+  tags:
+  - artifacts
+  - initial
+- id: REQ-020
+  title: One first-class artifact type
+  description: The database shall have exactly one first-class object type, a REQUIREMENTS-TO-IMPLEMENTATION
+    ARTIFACT pairing a REQUIREMENT SPECIFICATION with an IMPLEMENTATION; specifications,
+    concrete design files, verification reports and evidence, semantic decompositions,
+    and provenance metadata shall be constituent data of these artifacts rather than
+    independently addressable first-class database objects.
+  refines:
+  - REQ-101
+  status: approved
+  tags:
+  - artifacts
+  - initial
+- id: REQ-021
+  title: Relevant inference only
+  description: The system shall include an agent's inference only as constituent data
+    of a new REQUIREMENTS-TO-IMPLEMENTATION ARTIFACT and only when that inference
+    contributes to the artifact's traceability; inference that does not contribute
+    to traceability shall be omitted, and the system shall not create standalone inference,
+    reasoning, or provenance-account objects.
+  refines:
+  - REQ-101
+  status: approved
+  tags:
+  - artifacts
+  - initial
+- id: REQ-022
+  title: Alternative implementations
+  description: The database shall permit multiple REQUIREMENTS-TO-IMPLEMENTATION ARTIFACTs
+    containing the same REQUIREMENT SPECIFICATION and different IMPLEMENTATIONs; each
+    alternative shall retain its own VERIFICATION REPORT, CONTENT ADDRESS, and provenance
+    history.
+  refines:
+  - REQ-101
+  status: approved
+  tags:
+  - artifacts
+  - initial
+- id: REQ-023
+  title: Specification-specific artifacts
+  description: The database shall represent the same concrete design against different
+    REQUIREMENT SPECIFICATIONs as separate REQUIREMENTS-TO-IMPLEMENTATION ARTIFACTs;
+    each artifact's IMPLEMENTATION shall provide verification artifacts tracing that
+    design to the particular specification in that artifact.
+  refines:
+  - REQ-101
+  status: approved
+  tags:
+  - artifacts
+  - initial
+- id: REQ-048
+  title: Publisher signatures
+  description: Published artifacts shall carry publisher signatures authenticating
+    the committed payload; recipients shall be able to inspect the signing identity
+    and validate signatures independently of the distributing CACHE. Signatures authenticate
+    public-key identities, not real-world identity or factual claims.
+  refines:
+  - REQ-101
+  status: approved
+  tags:
+  - artifacts
+  - initial
+- id: REQ-049
+  title: Identity is not evidence truth
+  description: The system shall distinguish authenticated publisher identity from
+    verification of the artifact's claims; a valid publisher signature shall not by
+    itself establish evidence truthfulness, reproduction fidelity, verifier independence,
+    or a trusted real-world identity.
+  refines:
+  - REQ-101
+  status: approved
+  tags:
+  - artifacts
+  - initial
+- id: REQ-050
+  title: Payload signing and final hashing
+  description: The system shall hash a deterministic payload containing signing context
+    and identity, obtain the publisher signature over that hash, then SHA-256 hash
+    the complete artifact including signature and signing metadata for its final CONTENT
+    ADDRESS. The payload hash is an internal signing value, not a separately retrievable
+    database object.
+  refines:
+  - REQ-101
+  status: approved
+  tags:
+  - artifacts
+  - initial
+- id: REQ-051
+  title: Signature and address validation
+  description: Signature validation shall recompute the payload hash and validate
+    the publisher signature against it, while content-address validation shall recompute
+    the hash of the complete artifact; all dependency and predecessor references shall
+    identify artifacts by their final CONTENT ADDRESSes, and changes to the payload,
+    signature, or signing metadata shall produce a new artifact address.
+  refines:
+  - REQ-101
+  status: approved
+  tags:
+  - artifacts
+  - initial

@@ -1,0 +1,83 @@
+# Requirements model; all controls remain unverified until evidence is supplied.
+---
+requirements:
+- id: REQ-006
+  title: Distributed CACHE instances
+  description: The system shall support distributed deployment; an instance of the
+    system is known as a CACHE.
+  refines:
+  - REQ-104
+  status: approved
+  tags:
+  - caches
+  - initial
+- id: REQ-007
+  title: CACHE network addressing
+  description: A CACHE may be referred to by its internet address together with a
+    port number.
+  refines:
+  - REQ-104
+  status: approved
+  tags:
+  - caches
+  - initial
+- id: REQ-008
+  title: Remote substitution
+  description: If a CONTENT ADDRESS is not available in the local CACHE, the system
+    shall support retrieving the corresponding entry from another CACHE (as with Nix
+    substituters).
+  refines:
+  - REQ-104
+  status: approved
+  tags:
+  - caches
+  - initial
+- id: REQ-029
+  title: Ordered remote CACHE configuration
+  description: Each CACHE shall support an explicitly configured ordered list of remote
+    CACHE internet addresses and port numbers; when an artifact is absent locally,
+    the CACHE shall attempt retrieval from those remote CACHEs in the configured order
+    until a valid matching artifact is obtained or the list is exhausted.
+  refines:
+  - REQ-104
+  status: approved
+  tags:
+  - caches
+  - initial
+- id: REQ-030
+  title: Complete versus partial integrity checks
+  description: Before accepting an artifact as valid, a CACHE shall validate its complete
+    representation against the requested final SHA-256 CONTENT ADDRESS; partial disclosures
+    shall be labeled partial and bound by verifiable commitments rather than represented
+    as a complete artifact. Invalid content shall be rejected; inability to check
+    shall remain unknown.
+  refines:
+  - REQ-104
+  status: approved
+  tags:
+  - caches
+  - initial
+- id: REQ-062
+  title: Single process and local disk first
+  description: The initial CACHE shall run as a single process using local disk for
+    persistent artifact storage and necessary indexes and access configuration, without
+    requiring an external database service; this deployment shall support the configured
+    remote CACHE discovery and retrieval interfaces.
+  refines:
+  - REQ-104
+  status: approved
+  tags:
+  - caches
+  - initial
+- id: REQ-063
+  title: Scalable deployment later
+  description: A later phase shall support scalable distributed storage and execution
+    while preserving artifact identities, verification meaning, access restrictions,
+    and compatible client API behavior; multi-process mechanisms and quantitative
+    scale targets shall be defined before that phase's acceptance.
+  refines:
+  - REQ-104
+  status: approved
+  tags:
+  - caches
+  - later

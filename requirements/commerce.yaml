@@ -1,0 +1,102 @@
+# Requirements model; all controls remain unverified until evidence is supplied.
+---
+requirements:
+- id: REQ-037
+  title: Queryable offerings and authorized access
+  description: The system shall permit publishers to make specifications queryable,
+    present verification evidence or proofs upon request under the applicable access
+    restrictions, and sell access to the concrete implementation, granting implementation
+    access only to an authorized requester.
+  refines:
+  - REQ-106
+  status: approved
+  tags:
+  - commerce
+  - initial
+- id: REQ-054
+  title: Physical articles versus know-how
+  description: A transaction for a physical article shall not grant access to its
+    design or manufacturing know-how; the associated VERIFICATION REPORT may be disclosed
+    under separately applicable permissions, and manufacturing know-how may be sold
+    separately with independent pricing and permissions.
+  refines:
+  - REQ-106
+  status: approved
+  tags:
+  - commerce
+  - initial
+- id: REQ-056
+  title: Assembly validation as distinct value
+  description: The commercial mechanism shall distinguish physical-article purchases
+    from paid access to manufacturing know-how and shall permit compensation for assembly-validation
+    work independently of component-validation work, without requiring bundled component
+    access or attributing component-validation work to the integrator.
+  refines:
+  - REQ-106
+  status: approved
+  tags:
+  - commerce
+  - initial
+- id: REQ-065
+  title: Host-provided payment processing
+  description: Each host shall be able to connect its own payment infrastructure through
+    an integration hook; the initial system shall not require a particular payment
+    provider or implement payment processing itself.
+  refines:
+  - REQ-106
+  status: approved
+  tags:
+  - commerce
+  - initial
+- id: REQ-066
+  title: Uniform access-payment workflow
+  description: Payment for access shall be a first-class API workflow with uniform
+    operations to initiate an access-payment request, obtain a stable request identifier
+    and host-provided payment instructions, and query or wait for transaction clearance
+    and resulting access status independently of the host's payment provider.
+  refines:
+  - REQ-106
+  status: approved
+  tags:
+  - commerce
+  - initial
+- id: REQ-067
+  title: Exact terms and idempotent clearance
+  description: An access-payment request shall bind the requester, artifact CONTENT
+    ADDRESS, requested content or access scope, and host's quoted terms; when payment
+    is required, the CACHE shall grant the agreed access only after its payment integration
+    confirms clearance, expose pending, cleared, unsuccessful, and access-grant outcomes
+    distinctly, and handle retried requests or duplicate clearance notifications without
+    unintended duplicate charges or grants.
+  refines:
+  - REQ-106
+  status: approved
+  tags:
+  - commerce
+  - initial
+- id: REQ-068
+  title: Payment state is operational
+  description: Payment requests and transaction-clearance state shall be CACHE operational
+    state rather than additional first-class artifact database objects; payment or
+    access-state transitions shall not alter artifact content addresses or grant access
+    beyond the agreed scope.
+  refines:
+  - REQ-106
+  status: approved
+  tags:
+  - commerce
+  - initial
+- id: REQ-070
+  title: Seller-controlled upgrades
+  description: The access-request workflow shall support a seller-provided eligibility
+    hook that can recognize a purchaser's identity and prior purchases and bypass
+    payment for an offered upgrade; approval shall issue an explicit grant for the
+    new artifact CONTENT ADDRESS and agreed scope, expose that payment was not required
+    rather than falsely report transaction clearance, and shall not make provenance
+    links alone confer entitlement.
+  refines:
+  - REQ-106
+  status: approved
+  tags:
+  - commerce
+  - initial

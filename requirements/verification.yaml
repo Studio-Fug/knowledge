@@ -1,0 +1,271 @@
+# Requirements model; all controls remain unverified until evidence is supplied.
+requirements:
+- id: REQ-003
+  title: Requirement-to-evidence traceability
+  description: A VERIFICATION REPORT shall show traceability of the concrete design to the
+    REQUIREMENT SPECIFICATION and explicitly identify remaining verification work, including
+    missing evidence and failed verification.
+  refines:
+  - REQ-102
+  status: approved
+  tags:
+  - verification
+  - initial
+- id: REQ-010
+  title: Incomplete evidence storage
+  description: The database shall permit storage of IMPLEMENTATIONs with incomplete verification
+    evidence.
+  refines:
+  - REQ-102
+  status: approved
+  tags:
+  - verification
+  - initial
+- id: REQ-011
+  title: Specification-relative verification completeness
+  description: The system shall expose a machine-readable verification status for each IMPLEMENTATION
+    and shall classify it as fully verified only when passing evidence covers every requirement
+    in its REQUIREMENT SPECIFICATION for that concrete design and meets any evidence or rigor
+    demands explicitly specified; missing, failed, or stale evidence shall prevent that classification.
+  refines:
+  - REQ-102
+  status: approved
+  tags:
+  - verification
+  - initial
+- id: REQ-012
+  title: Safe default reuse
+  description: Reuse selection shall require a fully verified artifact by default; dependency
+    resolution shall apply the assembly-coverage rule of REQ-013 rather than impose universal
+    prior component verification. Explicit opt-in shall permit incomplete artifacts for development
+    or inspection without upgrading their status. Browsing and storage may include incomplete
+    and failed artifacts. Verification and requester-checking statuses shall remain visible
+    across CACHE boundaries.
+  refines:
+  - REQ-102
+  status: approved
+  tags:
+  - verification
+  - initial
+- id: REQ-013
+  title: Assembly coverage of component obligations
+  description: Full verification shall require evidence covering dependency-related obligations
+    of the artifact's REQUIREMENT SPECIFICATION, supplied by applicable dependency verification
+    or by verification performed for the assembly; lack of prior component verification shall
+    not prevent full verification when assembly evidence covers all requirements and explicitly
+    demanded rigor, but missing required evidence shall prevent it. Version-history references
+    shall not constitute implementation dependencies.
+  refines:
+  - REQ-102
+  status: approved
+  tags:
+  - verification
+  - initial
+- id: REQ-024
+  title: Applicable evidence reuse
+  description: When constructing a new REQUIREMENTS-TO-IMPLEMENTATION ARTIFACT, the system
+    shall permit direct reuse of verification evidence cached in an existing artifact when
+    that evidence applies to the concrete design and covers the new specification's full traceability
+    requirements; the new artifact shall contain the reused evidence and its trace to the
+    new specification, and shall determine its own verification status rather than inherit
+    the source artifact's status.
+  refines:
+  - REQ-102
+  status: approved
+  tags:
+  - verification
+  - initial
+- id: REQ-025
+  title: Optional demanded rigor
+  description: A REQUIREMENT SPECIFICATION may define required verification evidence and rigor
+    levels; the system shall permit specifications that omit those demands and shall enforce
+    them when explicitly specified.
+  refines:
+  - REQ-102
+  status: approved
+  tags:
+  - verification
+  - initial
+- id: REQ-026
+  title: Evidence-derived achieved rigor
+  description: The VERIFICATION REPORT shall record the verification methods and rigor actually
+    supported by its evidence, traceable to the requirements and concrete design verified,
+    whether or not the REQUIREMENT SPECIFICATION demands a particular rigor level; absent
+    evidence shall not establish an achieved rigor level.
+  refines:
+  - REQ-102
+  status: approved
+  tags:
+  - verification
+  - initial
+- id: REQ-028
+  title: Simulation can fully verify
+  description: When a REQUIREMENT SPECIFICATION demands no particular verification rigor,
+    passing simulation evidence may establish full verification if it covers every requirement
+    for the concrete design and all other full-verification conditions are met; this classification
+    shall not imply physical construction or testing, which shall remain a separate evidence-based
+    query dimension.
+  refines:
+  - REQ-102
+  status: approved
+  tags:
+  - verification
+  - initial
+- id: REQ-038
+  title: Reported versus independently checked evidence
+  description: Evidence and proof responses shall identify the target artifact's final CONTENT
+    ADDRESS and verification-subject commitments, specification, claims, scope, and rigor.
+    The initial system may disclose a signed report without disclosing restricted design data,
+    but shall distinguish reported claims from what the requester has actually checked; checks
+    requiring unavailable inputs shall remain unchecked.
+  refines:
+  - REQ-102
+  status: approved
+  tags:
+  - verification
+  - initial
+- id: REQ-039
+  title: Recipient re-verification artifacts
+  description: Authorized recipients of physical articles or manufacturing know-how shall
+    be able to rerun applicable checks and publish a new specification-to-implementation artifact
+    with their report and evidence, linked to the original. The report shall identify the
+    exact specification, design or physical scope, procedure, conditions, results, and verifying
+    party; undisclosed know-how need not be included as plaintext.
+  refines:
+  - REQ-102
+  status: approved
+  tags:
+  - verification
+  - initial
+- id: REQ-040
+  title: Attribution and authenticity limits
+  description: Verification evidence shall distinguish publisher-supplied results from recipient
+    or third-party re-verification and expose the provenance and scope of each report; the
+    system shall not treat a valid content hash, cryptographic proof, or claimed independent
+    report alone as establishing the truth of physical measurements or the independence of
+    the reporting party.
+  refines:
+  - REQ-102
+  status: approved
+  tags:
+  - verification
+  - initial
+- id: REQ-041
+  title: Failed and conflicting reproduction reports
+  description: The system shall provide a submission and retrieval hook for recipient or third-party
+    re-verification artifacts, including failed results, and shall expose conflicting reports
+    linked to the original artifact, subject to access restrictions; reports shall remain
+    constituent data of REQUIREMENTS-TO-IMPLEMENTATION ARTIFACTs rather than standalone database
+    objects.
+  refines:
+  - REQ-102
+  status: approved
+  tags:
+  - verification
+  - initial
+- id: REQ-042
+  title: Reproduction fidelity information
+  description: A re-verification report shall record the reproduction procedure, test environment
+    and conditions, and known deviations from the original design or validation procedure,
+    distinguishing unknown reproduction details from confirmed agreement; the system shall
+    not assume a reproduction is faithful or treat a conflicting result alone as conclusively
+    establishing which report is correct.
+  refines:
+  - REQ-102
+  status: approved
+  tags:
+  - verification
+  - initial
+- id: REQ-045
+  title: Scope-appropriate verification SOP
+  description: Each artifact shall include a verification SOP containing the necessary build
+    or preparation instructions, tools, dependencies, equipment, setup, inputs, conditions,
+    steps, acceptance criteria, evidence capture, and specification traces for its declared
+    verification scope. Missing necessary instructions shall be explicit remaining work and
+    prevent full verification. A physical-article SOP need not disclose how to manufacture
+    it; manufacturing instructions may remain in the restricted know-how scope.
+  refines:
+  - REQ-102
+  status: approved
+  tags:
+  - verification
+  - initial
+- id: REQ-046
+  title: Pinned procedural references
+  description: SOPs may assume ordinary domain knowledge and reference precisely identified
+    established procedures; necessary references shall identify the applicable revision and
+    immutable content commitment and be available to a requester authorized for that verification
+    scope. The artifact shall commit to instructions and necessary reference content without
+    introducing independent first-class database objects.
+  refines:
+  - REQ-102
+  status: approved
+  tags:
+  - verification
+  - initial
+- id: REQ-055
+  title: Assembly reports without component disclosure
+  description: An integrator shall be able to offer a validated physical assembly with a report
+    tracing to the assembly specification without disclosing component designs, know-how,
+    reports, or other component data. Assembly purchase shall not grant component access.
+    This disclosure rule shall not waive evidence obligations of the assembly specification.
+  refines:
+  - REQ-102
+  status: approved
+  tags:
+  - verification
+  - initial
+- id: REQ-057
+  title: Component screening and selection
+  description: An integrator shall be able to verify previously unverified components, reject
+    failing units, and verify assemblies containing selected passing units when the evidence
+    covers the assembly specification. Reports and SOPs shall state tested scope and screening
+    or selection conditions rather than imply that untested units or arbitrary assemblies
+    are verified.
+  refines:
+  - REQ-102
+  status: approved
+  tags:
+  - verification
+  - initial
+- id: REQ-058
+  title: Design, batch, and unit scope
+  description: VERIFICATION REPORTs shall explicitly distinguish design, batch, and individual-unit
+    verification and identify the applicable design revision, batch or lot, or individual
+    unit as appropriate; each claim and its supporting evidence shall state its applicable
+    scope, and verification at one scope shall not automatically establish verification at
+    another.
+  refines:
+  - REQ-102
+  status: approved
+  tags:
+  - verification
+  - initial
+- id: REQ-077
+  title: Signed reports initially
+  description: The initial system shall support signed reports bound to immutable verification-subject
+    commitments covering the specification, design or tested physical scope, procedures and
+    conditions, and reported claims and rigor. A report embedded in an artifact shall not
+    contain that artifact's final address as a self-reference; responses bind it to the final
+    address after publication. Signature validity shall remain distinct from claim truth,
+    and initial deployment shall not require a ZKP system.
+  refines:
+  - REQ-102
+  status: approved
+  tags:
+  - verification
+  - initial
+- id: REQ-078
+  title: Future proof extension hook
+  description: The system shall provide a future proof extension hook for explicitly identified
+    claims over artifact and verification-subject commitments without making the proof include
+    its own enclosing final artifact address; proof responses shall identify that final address
+    externally. Unsupported or unchecked proofs remain unchecked; proof data remains constituent
+    artifact data subject to access controls.
+  refines:
+  - REQ-102
+  status: approved
+  tags:
+  - verification
+  - initial-hook
+  - later-proof
