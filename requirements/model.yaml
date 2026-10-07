@@ -62,7 +62,7 @@ requirements:
     satisfies: [UN-001, UN-002]
 
   - id: REQ-014
-    title: The system shall compute an IMPLEMENTATION's CONTENT ADDRESS as the SHA-256 of a deterministic manifest covering all of its data, including its REQUIREMENT SPECIFICATION, concrete design files, VERIFICATION REPORT and evidence, SEMANTIC DECOMPOSITION, implementation dependencies, version-history predecessors, and display-only predecessor explanations, with referenced content identified by CONTENT ADDRESS.
+    title: The system shall compute a REQUIREMENTS-TO-IMPLEMENTATION ARTIFACT's CONTENT ADDRESS as the SHA-256 of a deterministic manifest covering all of its data, including its REQUIREMENT SPECIFICATION, concrete design files, VERIFICATION REPORT and evidence, SEMANTIC DECOMPOSITION, implementation dependencies, version-history predecessors, and display-only predecessor explanations, with referenced artifacts identified by CONTENT ADDRESS.
     satisfies: [UN-001, UN-002]
 
   - id: REQ-015
@@ -84,3 +84,11 @@ requirements:
   - id: REQ-019
     title: Every bit of stored data belonging to a database object shall be covered by its CONTENT ADDRESS, directly or through content-addressed references; no object metadata, including display-only or non-authoritative data, shall exist outside that coverage, and changing any such data shall produce a distinct object with a new CONTENT ADDRESS.
     satisfies: [UN-001, UN-002]
+
+  - id: REQ-020
+    title: The database shall have exactly one first-class object type, a REQUIREMENTS-TO-IMPLEMENTATION ARTIFACT pairing a REQUIREMENT SPECIFICATION with an IMPLEMENTATION; specifications, concrete design files, verification reports and evidence, semantic decompositions, and provenance metadata shall be constituent data of these artifacts rather than independently addressable first-class database objects.
+    satisfies: [UN-001, UN-002, UN-003]
+
+  - id: REQ-021
+    title: The system shall persist an agent's inference as a database entry only when the agent produces a new REQUIREMENTS-TO-IMPLEMENTATION ARTIFACT; it shall not create standalone inference, reasoning, or provenance-account objects.
+    satisfies: [UN-001]
