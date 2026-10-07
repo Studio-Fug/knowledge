@@ -168,3 +168,11 @@ requirements:
   - id: REQ-040
     title: Verification evidence shall distinguish publisher-supplied results from recipient or third-party re-verification and expose the provenance and scope of each report; the system shall not treat a valid content hash, cryptographic proof, or claimed independent report alone as establishing the truth of physical measurements or the independence of the reporting party.
     satisfies: [UN-001, UN-003]
+
+  - id: REQ-041
+    title: The system shall provide a submission and retrieval hook for recipient or third-party re-verification artifacts, including failed results, and shall expose conflicting reports linked to the original artifact, subject to access restrictions; reports shall remain constituent data of REQUIREMENTS-TO-IMPLEMENTATION ARTIFACTs rather than standalone database objects.
+    satisfies: [UN-001, UN-002, UN-003]
+
+  - id: REQ-042
+    title: A re-verification report shall record the reproduction procedure, test environment and conditions, and known deviations from the original design or validation procedure, distinguishing unknown reproduction details from confirmed agreement; the system shall not assume a reproduction is faithful or treat a conflicting result alone as conclusively establishing which report is correct.
+    satisfies: [UN-001]
