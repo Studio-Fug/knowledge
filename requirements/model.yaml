@@ -288,3 +288,11 @@ requirements:
   - id: REQ-070
     title: The access-request workflow shall support a seller-provided eligibility hook that can recognize a purchaser's identity and prior purchases and bypass payment for an offered upgrade; approval shall issue an explicit grant for the new artifact CONTENT ADDRESS and agreed scope, expose that payment was not required rather than falsely report transaction clearance, and shall not make provenance links alone confer entitlement.
     satisfies: [UN-001, UN-002]
+
+  - id: REQ-071
+    title: Requesters shall be identified by public keys or unambiguous public-key identifiers and shall authenticate protected API requests by signing them with the corresponding private key; the CACHE shall validate those signatures without requiring a central account service and shall associate access grants, payment requests, and seller upgrade eligibility with the authenticated requester identity.
+    satisfies: [UN-001, UN-002]
+
+  - id: REQ-072
+    title: Signed-request authentication shall bind the request's operation, target CACHE, artifact and access scope where applicable, and request content, and shall include freshness and replay protection; the CACHE shall reject altered, invalid, or replayed authentication rather than authorize actions solely from possession of a public key or purchaser identifier.
+    satisfies: [UN-001, UN-002]
