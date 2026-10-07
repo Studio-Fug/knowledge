@@ -312,3 +312,11 @@ requirements:
   - id: REQ-076
     title: The system shall support separate encryption scopes and independently released decryption keys for verification reports and evidence versus concrete design and manufacturing know-how; authorizing or decrypting one scope shall not unlock the other, and payment requests, grants, and key release shall identify the exact artifact CONTENT ADDRESS and authorized scope.
     satisfies: [UN-001, UN-002]
+
+  - id: REQ-077
+    title: The initial system shall support signed VERIFICATION REPORTs bound to the exact artifact, specification, claims, and achieved rigor, with access-controlled report disclosure and signature validation; deployment shall not require zero-knowledge proof generation or a particular proof system, and signature validity shall remain distinct from evidence truthfulness and verification of the reported claims.
+    satisfies: [UN-001, UN-002]
+
+  - id: REQ-078
+    title: The system shall provide an extension hook for future zero-knowledge proof generation and checking bound to artifact commitments and explicitly identified claims; proof support shall preserve access scopes and the sole first-class artifact type, and unsupported or unchecked proofs shall be reported as such rather than counted as verified by the requester.
+    satisfies: [UN-001, UN-002]
