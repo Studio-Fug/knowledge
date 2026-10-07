@@ -120,3 +120,11 @@ requirements:
   - id: REQ-028
     title: When a REQUIREMENT SPECIFICATION demands no particular verification rigor, passing simulation evidence may establish full verification if it covers every requirement for the concrete design and all other full-verification conditions are met; this classification shall not imply physical construction or testing, which shall remain a separate evidence-based query dimension.
     satisfies: [UN-001, UN-003]
+
+  - id: REQ-029
+    title: Each CACHE shall support an explicitly configured ordered list of remote CACHE internet addresses and port numbers; when an artifact is absent locally, the CACHE shall attempt retrieval from those remote CACHEs in the configured order until a valid matching artifact is obtained or the list is exhausted.
+    satisfies: [UN-002]
+
+  - id: REQ-030
+    title: A CACHE shall validate retrieved artifact content against the requested SHA-256 CONTENT ADDRESS before accepting it for local storage or use; content whose computed address does not match shall be rejected and shall not satisfy the retrieval request.
+    satisfies: [UN-001, UN-002]
