@@ -46,16 +46,19 @@ classified as fully verified.
 
 An implementation's content address is the SHA-256 of a deterministic manifest
 identifying its specification, design files, verification report and evidence,
-dependencies, and predecessor by content address where present. The precise
+dependencies, and predecessors by content address where present. The precise
 manifest format and byte encoding remain to be defined.
 
 Objects are immutable. New evidence, features, requirements, or changes in
-composition produce a distinct object. Each new version includes the previous
-version's hash in its own hashed content, making the history traversable and
-binding each version to its ancestry. The initial version has no predecessor.
+composition produce a distinct object. A derived version records one or more
+predecessor objects that contributed conceptually to its production. All of
+those hashes are included in its own hashed content, making the provenance
+traversable and binding the version to its ancestry. An initial object records
+an empty predecessor set. History can branch and merge, preserving the origins
+of ideas as well as the sequence of versions.
 These behaviors are captured in REQ-014 through REQ-016.
 
-A predecessor is a history reference, not an implementation dependency. A fully
+Predecessors record conceptual provenance; they are not implementation dependencies. A fully
 verified version may therefore follow an incompletely verified version.
 
 ## Remaining decisions to make together
