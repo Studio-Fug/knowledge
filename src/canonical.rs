@@ -1,6 +1,9 @@
 //! v1 JSON: sorted object keys, UTF-8 strings, integers only, no duplicate keys.
 use crate::{Error, Result};
-use serde::{Deserialize, Serialize, de::{self, MapAccess, SeqAccess, Visitor}};
+use serde::{
+    Deserialize, Serialize,
+    de::{self, MapAccess, SeqAccess, Visitor},
+};
 use serde_json::{Map, Number, Value};
 use sha2::{Digest, Sha256};
 use std::{collections::BTreeSet, fmt};
@@ -10,28 +13,56 @@ pub const MAX_BYTES: usize = 4 * 1024 * 1024;
 struct Unique(Value);
 
 impl<'de> Deserialize<'de> for Unique {
-    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> std::result::Result<Self, D::Error> {
+    fn deserialize<D: serde::Deserializer<'de>>(
+        deserializer: D,
+    ) -> std::result::Result<Self, D::Error> {
         struct JsonVisitor;
         impl<'de> Visitor<'de> for JsonVisitor {
             type Value = Unique;
-            fn expecting(&self, f: &mut fmt::Formatter) -> fmt::Result { f.write_str("unambiguous integer-only JSON") }
-            fn visit_bool<E: de::Error>(self, v: bool) -> std::result::Result<Unique, E> { Ok(Unique(Value::Bool(v))) }
-            fn visit_i64<E: de::Error>(self, v: i64) -> std::result::Result<Unique, E> { Ok(Unique(Value::Number(Number::from(v)))) }
-            fn visit_u64<E: de::Error>(self, v: u64) -> std::result::Result<Unique, E> { Ok(Unique(Value::Number(Number::from(v)))) }
-            fn visit_f64<E: de::Error>(self, _: f64) -> std::result::Result<Unique, E> { Err(E::custom("floating-point numbers are unsupported")) }
-            fn visit_str<E: de::Error>(self, v: &str) -> std::result::Result<Unique, E> { Ok(Unique(Value::String(v.into()))) }
-            fn visit_string<E: de::Error>(self, v: String) -> std::result::Result<Unique, E> { Ok(Unique(Value::String(v))) }
-            fn visit_unit<E: de::Error>(self) -> std::result::Result<Unique, E> { Ok(Unique(Value::Null)) }
-            fn visit_seq<A: SeqAccess<'de>>(self, mut seq: A) -> std::result::Result<Unique, A::Error> {
+            fn expecting(&self, f: &mut fmt::Formatter) -> fmt::Result {
+                f.write_str("unambiguous integer-only JSON")
+            }
+            fn visit_bool<E: de::Error>(self, v: bool) -> std::result::Result<Unique, E> {
+                Ok(Unique(Value::Bool(v)))
+            }
+            fn visit_i64<E: de::Error>(self, v: i64) -> std::result::Result<Unique, E> {
+                Ok(Unique(Value::Number(Number::from(v))))
+            }
+            fn visit_u64<E: de::Error>(self, v: u64) -> std::result::Result<Unique, E> {
+                Ok(Unique(Value::Number(Number::from(v))))
+            }
+            fn visit_f64<E: de::Error>(self, _: f64) -> std::result::Result<Unique, E> {
+                Err(E::custom("floating-point numbers are unsupported"))
+            }
+            fn visit_str<E: de::Error>(self, v: &str) -> std::result::Result<Unique, E> {
+                Ok(Unique(Value::String(v.into())))
+            }
+            fn visit_string<E: de::Error>(self, v: String) -> std::result::Result<Unique, E> {
+                Ok(Unique(Value::String(v)))
+            }
+            fn visit_unit<E: de::Error>(self) -> std::result::Result<Unique, E> {
+                Ok(Unique(Value::Null))
+            }
+            fn visit_seq<A: SeqAccess<'de>>(
+                self,
+                mut seq: A,
+            ) -> std::result::Result<Unique, A::Error> {
                 let mut values = Vec::new();
-                while let Some(Unique(value)) = seq.next_element()? { values.push(value); }
+                while let Some(Unique(value)) = seq.next_element()? {
+                    values.push(value);
+                }
                 Ok(Unique(Value::Array(values)))
             }
-            fn visit_map<A: MapAccess<'de>>(self, mut map: A) -> std::result::Result<Unique, A::Error> {
+            fn visit_map<A: MapAccess<'de>>(
+                self,
+                mut map: A,
+            ) -> std::result::Result<Unique, A::Error> {
                 let mut seen = BTreeSet::new();
                 let mut values = Map::new();
                 while let Some((key, Unique(value))) = map.next_entry::<String, Unique>()? {
-                    if !seen.insert(key.clone()) { return Err(de::Error::custom("duplicate object key")); }
+                    if !seen.insert(key.clone()) {
+                        return Err(de::Error::custom("duplicate object key"));
+                    }
                     values.insert(key, value);
                 }
                 Ok(Unique(Value::Object(values)))
@@ -42,7 +73,9 @@ impl<'de> Deserialize<'de> for Unique {
 }
 
 pub fn parse<T: serde::de::DeserializeOwned>(bytes: &[u8]) -> Result<T> {
-    if bytes.len() > MAX_BYTES { return Err(Error::new("too_large", "artifact or request exceeds 4 MiB")); }
+    if bytes.len() > MAX_BYTES {
+        return Err(Error::new("too_large", "artifact or request exceeds 4 MiB"));
+    }
     let Unique(value) = serde_json::from_slice(bytes)?;
     Ok(serde_json::from_value(value)?)
 }
@@ -55,7 +88,9 @@ pub fn encode<T: Serialize>(value: &T) -> Result<Vec<u8>> {
                 let mut entries: Vec<_> = map.iter().collect();
                 entries.sort_by(|a, b| a.0.cmp(b.0));
                 for (i, (key, value)) in entries.into_iter().enumerate() {
-                    if i != 0 { out.push(b','); }
+                    if i != 0 {
+                        out.push(b',');
+                    }
                     serde_json::to_writer(&mut *out, key)?;
                     out.push(b':');
                     write(value, out)?;
@@ -65,25 +100,38 @@ pub fn encode<T: Serialize>(value: &T) -> Result<Vec<u8>> {
             Value::Array(items) => {
                 out.push(b'[');
                 for (i, item) in items.iter().enumerate() {
-                    if i != 0 { out.push(b','); }
+                    if i != 0 {
+                        out.push(b',');
+                    }
                     write(item, out)?;
                 }
                 out.push(b']');
             }
-            Value::Number(n) if !n.is_i64() && !n.is_u64() => return Err(Error::new("invalid_json", "floating-point numbers are unsupported")),
+            Value::Number(n) if !n.is_i64() && !n.is_u64() => {
+                return Err(Error::new(
+                    "invalid_json",
+                    "floating-point numbers are unsupported",
+                ));
+            }
             _ => serde_json::to_writer(out, v)?,
         }
         Ok(())
     }
     let mut bytes = Vec::new();
     write(&serde_json::to_value(value)?, &mut bytes)?;
-    if bytes.len() > MAX_BYTES { return Err(Error::new("too_large", "canonical content exceeds 4 MiB")); }
+    if bytes.len() > MAX_BYTES {
+        return Err(Error::new("too_large", "canonical content exceeds 4 MiB"));
+    }
     Ok(bytes)
 }
 
-pub fn digest(bytes: &[u8]) -> String { hex::encode(Sha256::digest(bytes)) }
-
-pub fn is_hex(value: &str, bytes: usize) -> bool {
-    value.len() == bytes * 2 && value.bytes().all(|c| c.is_ascii_digit() || (b'a'..=b'f').contains(&c))
+pub fn digest(bytes: &[u8]) -> String {
+    hex::encode(Sha256::digest(bytes))
 }
 
+pub fn is_hex(value: &str, bytes: usize) -> bool {
+    value.len() == bytes * 2
+        && value
+            .bytes()
+            .all(|c| c.is_ascii_digit() || (b'a'..=b'f').contains(&c))
+}

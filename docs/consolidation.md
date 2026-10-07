@@ -57,6 +57,11 @@ requester identity, and outcomes; these require operational audit if replayed.
 8. **Budgets:** limits, retention, timeouts, backup procedures, supported platforms,
    and measurable performance targets before claiming scalability.
 
+The [initial Rust slice](implementation.md) fixes a provisional version-1 public
+encoding, signed artifacts, subject-bound trace checking, deterministic label
+matching, local storage limits, and exact-hash substitution. Confidential and
+commercial formats remain open. Runtime code and tests are entirely Rust.
+
 These are implementation tasks, not reasons to introduce more product object types.
 Reputation, physical-truth adjudication, and dispute mechanisms remain uncommitted.
 
@@ -66,4 +71,5 @@ The upstream `rules_requirements` parser and validator check the complete direct
 unique IDs, known fields, reference consistency, hierarchy cycles and single-parent
 rules, need coverage, mitigation links, and verification-method references.
 A coverage audit checks preservation of REQ-001–078 and controls for every risk.
-Verification procedures are plans; no product tests or `verified_by` evidence exist.
+Product acceptance procedures remain plans. Prototype Rust tests are documented
+separately; no requirement is marked `verified_by` merely because that slice passes.

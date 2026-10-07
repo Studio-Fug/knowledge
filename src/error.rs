@@ -11,7 +11,10 @@ pub type Result<T> = std::result::Result<T, Error>;
 
 impl Error {
     pub fn new(code: &'static str, message: impl Into<String>) -> Self {
-        Self { code, message: message.into() }
+        Self {
+            code,
+            message: message.into(),
+        }
     }
 }
 
@@ -34,4 +37,3 @@ impl From<serde_json::Error> for Error {
         Self::new("invalid_json", value.to_string())
     }
 }
-

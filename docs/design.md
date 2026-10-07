@@ -9,7 +9,9 @@ report and evidence, SOP, semantic decomposition, dependencies, and provenance.
 Incomplete artifacts are allowed; remaining work must be explicit.
 
 This repository currently contains requirements and an initial risk analysis.
-There is no implementation or product-verification evidence yet.
+The [initial Rust prototype](implementation.md) implements a public-artifact
+subset. Its tests establish specific software behavior, not compliance with the
+complete product requirements or truth of publishers' evidence.
 
 ## Requirements hierarchy
 
