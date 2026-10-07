@@ -264,3 +264,19 @@ requirements:
   - id: REQ-064
     title: The initial CACHE shall accept SEMANTIC DECOMPOSITIONs supplied by external agents as constituent artifact data through its publication interface, including revisions submitted as new artifacts under the existing history and hashing rules; deployment shall not require CACHE-hosted decomposition generation or a particular model provider, and supplied claims shall remain subject to the evidence-based verification distinctions.
     satisfies: [UN-001, UN-003]
+
+  - id: REQ-065
+    title: Each host shall be able to connect its own payment infrastructure through an integration hook; the initial system shall not require a particular payment provider or implement payment processing itself.
+    satisfies: [UN-001, UN-002]
+
+  - id: REQ-066
+    title: Payment for access shall be a first-class API workflow with uniform operations to initiate an access-payment request, obtain a stable request identifier and host-provided payment instructions, and query or wait for transaction clearance and resulting access status independently of the host's payment provider.
+    satisfies: [UN-001, UN-002]
+
+  - id: REQ-067
+    title: An access-payment request shall bind the requester, artifact CONTENT ADDRESS, requested content or access scope, and host's quoted terms; the CACHE shall grant the agreed access only after its payment integration confirms clearance, expose pending, cleared, unsuccessful, and access-grant outcomes distinctly, and handle retried requests or duplicate clearance notifications without unintended duplicate charges or grants.
+    satisfies: [UN-001, UN-002]
+
+  - id: REQ-068
+    title: Payment requests and transaction-clearance state shall be CACHE operational state rather than additional first-class artifact database objects; payment or access-state transitions shall not alter artifact content addresses or grant access beyond the agreed scope.
+    satisfies: [UN-001, UN-002]
