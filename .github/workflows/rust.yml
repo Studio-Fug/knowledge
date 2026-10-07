@@ -1,0 +1,28 @@
+name: Rust
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Install Rust
+        run: rustup toolchain install stable --profile minimal --component rustfmt,clippy
+      - name: Format
+        run: cargo +stable fmt
+      - name: Test
+        run: cargo +stable test --all-targets
+      - name: Lint
+        run: cargo +stable clippy --all-targets -- -D warnings
+      - name: Export bootstrap formatting and lockfile
+        if: always()
+        run: |
+          for file in Cargo.lock src/*.rs tests/*.rs; do
+            if [ -f "$file" ]; then
+              echo "KNOWLEDGE_FILE_BEGIN:$file"
+              base64 -w0 "$file"
+              echo
+              echo "KNOWLEDGE_FILE_END"
+            fi
+          done
