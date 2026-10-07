@@ -352,6 +352,14 @@ It must preserve content addresses, verification semantics, access restrictions,
 and client API behavior. Specific distributed mechanisms and measurable scale
 targets remain to be defined (REQ-063).
 
+## Initial semantic decomposition input
+
+The initial cache accepts semantic decompositions produced by external agents
+through artifact publication. Revisions use new artifacts and the existing
+hash-linked history. The cache requires no built-in decomposition generator or
+particular model provider; accepting a decomposition does not establish that
+its claims are verified (REQ-064).
+
 ## Remaining decisions to make together
 
 1. What deterministic manifest format and byte encoding shall be hashed?
