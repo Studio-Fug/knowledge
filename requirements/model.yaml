@@ -184,3 +184,11 @@ requirements:
   - id: REQ-044
     title: Artifact dependency relationships shall identify referenced artifacts by CONTENT ADDRESS independently of build-system-specific integration data, so support for additional build systems can be added without replacing the artifact dependency model; integration data stored in an artifact shall remain covered by its CONTENT ADDRESS.
     satisfies: [UN-001, UN-002]
+
+  - id: REQ-045
+    title: Each REQUIREMENTS-TO-IMPLEMENTATION ARTIFACT shall include a well-written standard operating procedure containing the information necessary for an authorized recipient to reproduce its verification, including applicable build instructions, tools and dependencies, equipment and setup, test inputs and conditions, ordered steps or automated commands, acceptance criteria, evidence capture, and traceability to the specification; physical procedures shall be documented where automated commands are insufficient, and any missing procedural information shall be explicit verification work remaining rather than compatible with full verification.
+    satisfies: [UN-001, UN-002]
+
+  - id: REQ-046
+    title: Verification procedures may rely on ordinary domain knowledge and precisely identified established procedures rather than restating general background; any referenced procedure necessary to reproduce verification shall identify the applicable revision and be available to the authorized recipient, with artifact-specific instructions and reference identifiers covered by the artifact's CONTENT ADDRESS.
+    satisfies: [UN-001, UN-002]
