@@ -296,3 +296,15 @@ requirements:
   - id: REQ-072
     title: Signed-request authentication shall bind the request's operation, target CACHE, artifact and access scope where applicable, and request content, and shall include freshness and replay protection; the CACHE shall reject altered, invalid, or replayed authentication rather than authorize actions solely from possession of a public key or purchaser identifier.
     satisfies: [UN-001, UN-002]
+
+  - id: REQ-073
+    title: The system shall support syndication by allowing CACHEs to distribute encrypted implementation content without granting access to its plaintext; syndicated offerings shall identify the exact artifact CONTENT ADDRESS, encrypted content, and controlling CACHE so requesters can obtain distributed content while directing access-payment requests to the controlling CACHE.
+    satisfies: [UN-001, UN-002]
+
+  - id: REQ-074
+    title: The controlling CACHE shall retain authority over decryption-key release for its syndicated implementation content and shall release the applicable key to an authenticated requester only under its authorized access scope following payment clearance or an explicitly approved payment bypass; a distributing CACHE shall not confer decryption rights merely by serving ciphertext.
+    satisfies: [UN-001, UN-002]
+
+  - id: REQ-075
+    title: Syndicated encrypted content shall be cryptographically bound to the identified artifact and validated before acceptance, and authorized recipients shall validate decrypted content against the artifact's committed content before use; private decryption keys shall be protected CACHE operational secrets rather than publicly distributed artifact data, and all stored encrypted artifact data and public encryption metadata shall remain covered by artifact content addressing.
+    satisfies: [UN-001, UN-002]
