@@ -250,5 +250,13 @@ requirements:
     satisfies: [UN-001, UN-002, UN-003]
 
   - id: REQ-061
-    title: A subsequent human browser shall be a client maintained in a separate repository and shall support the same use cases through the system API, including discovery, configurable filters, artifact and evidence inspection, provenance traversal, access-controlled retrieval, publication, and re-verification submission; the browser shall not introduce additional first-class database objects or require browser-only core operations.
+    title: A subsequent human browser shall be a client maintained in this repository and shall support the same use cases through the system API, including discovery, configurable filters, artifact and evidence inspection, provenance traversal, access-controlled retrieval, publication, and re-verification submission; the browser shall not introduce additional first-class database objects or require browser-only core operations.
     satisfies: [UN-001, UN-002, UN-003]
+
+  - id: REQ-062
+    title: The initial CACHE shall run as a single process using local disk for persistent artifact storage and necessary indexes and access configuration, without requiring an external database service; this deployment shall support the configured remote CACHE discovery and retrieval interfaces.
+    satisfies: [UN-001, UN-002, UN-003]
+
+  - id: REQ-063
+    title: The system shall eventually support scalable distributed deployment beyond the initial single-process local-disk CACHE while preserving artifact content addresses, verification semantics, access restrictions, and client API behavior; distributed storage and execution mechanisms and quantitative scale targets shall be defined in a later phase.
+    satisfies: [UN-002]
