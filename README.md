@@ -37,16 +37,31 @@ implementations by default. An explicit opt-in permits other implementations,
 whose verification status must remain visible, including across caches. These
 behaviors are captured in REQ-003 and REQ-010 through REQ-013.
 
-Full verification also requires every referenced implementation, directly or
+Full verification also requires every implementation dependency, directly or
 transitively, to be fully verified. Missing, incomplete, failed, stale, or unknown
 verification of a dependency prevents the containing implementation from being
 classified as fully verified.
 
+## Agreed content addressing and history
+
+An implementation's content address is the SHA-256 of a deterministic manifest
+identifying its specification, design files, verification report and evidence,
+dependencies, and predecessor by content address where present. The precise
+manifest format and byte encoding remain to be defined.
+
+Objects are immutable. New evidence, features, requirements, or changes in
+composition produce a distinct object. Each new version includes the previous
+version's hash in its own hashed content, making the history traversable and
+binding each version to its ancestry. The initial version has no predecessor.
+These behaviors are captured in REQ-014 through REQ-016.
+
+A predecessor is a history reference, not an implementation dependency. A fully
+verified version may therefore follow an incompletely verified version.
+
 ## Remaining decisions to make together
 
 1. What evidence and verification rigor does each requirement demand?
-2. What exact bytes does a content address hash? How are multi-file designs and
-   references represented?
+2. What deterministic manifest format and byte encoding shall be hashed?
 3. Can one specification map to multiple implementations, and can one
    implementation satisfy multiple specifications?
 4. When must implementation references become build dependencies? Is Bazel the
