@@ -335,12 +335,22 @@ The initial interfaces are an agent-friendly API and CLI, with machine-readable
 inputs, results, verification summaries, and errors. The API supports the
 operations required by both agent and human clients (REQ-060).
 
-A human browser follows later as a client in a separate repository, supporting
+A human browser follows later as a client in this repository, supporting
 the same use cases through the API. It includes discovery and filters, artifact
 and evidence inspection, provenance, access-controlled retrieval, publication,
-and re-verification submission. It is not a first-class feature of this core
-repository and introduces no browser-only core operations or database object
-types (REQ-061). The browser repository has not yet been created.
+and re-verification submission. It introduces no browser-only core operations
+or additional database object types (REQ-061).
+
+## Initial deployment and future scale
+
+The initial cache is a single process with persistent artifacts, indexes, and
+access configuration on local disk. It requires no external database service
+and supports discovery and retrieval from configured remote caches (REQ-062).
+
+Scalable distributed deployment beyond that initial process is a later phase.
+It must preserve content addresses, verification semantics, access restrictions,
+and client API behavior. Specific distributed mechanisms and measurable scale
+targets remain to be defined (REQ-063).
 
 ## Remaining decisions to make together
 
