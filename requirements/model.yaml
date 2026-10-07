@@ -176,3 +176,11 @@ requirements:
   - id: REQ-042
     title: A re-verification report shall record the reproduction procedure, test environment and conditions, and known deviations from the original design or validation procedure, distinguishing unknown reproduction details from confirmed agreement; the system shall not assume a reproduction is faithful or treat a conflicting result alone as conclusively establishing which report is correct.
     satisfies: [UN-001]
+
+  - id: REQ-043
+    title: The system shall initially support Bazel and Nix integration for expanding content-addressed implementation dependencies into the relationships required by those systems; other build systems are outside the initial integration scope.
+    satisfies: [UN-001, UN-002]
+
+  - id: REQ-044
+    title: Artifact dependency relationships shall identify referenced artifacts by CONTENT ADDRESS independently of build-system-specific integration data, so support for additional build systems can be added without replacing the artifact dependency model; integration data stored in an artifact shall remain covered by its CONTENT ADDRESS.
+    satisfies: [UN-001, UN-002]
