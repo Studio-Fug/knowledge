@@ -144,3 +144,19 @@ requirements:
   - id: REQ-034
     title: Browsing and semantic search results shall expose verification statuses and evidence references for individual capabilities and constraints in their summaries so agents can identify verified claims without inspecting the entire artifact; the system shall support filtering by verified capabilities and constraints and shall not infer verification of every semantic capability or constraint from an artifact's overall fully verified status.
     satisfies: [UN-001, UN-003]
+
+  - id: REQ-035
+    title: The system shall support semantic search of the local CACHE and configured remote CACHEs, with a selectable search scope and results identifying the originating CACHE and artifact CONTENT ADDRESS.
+    satisfies: [UN-002, UN-003]
+
+  - id: REQ-036
+    title: The system shall support separately controlled access to an artifact's published REQUIREMENT SPECIFICATION and semantic discovery data, requested verification evidence or proofs, and concrete IMPLEMENTATION; public discovery shall not grant access to restricted evidence or implementation content, including through direct content-address retrieval or remote CACHE substitution.
+    satisfies: [UN-001, UN-002, UN-003]
+
+  - id: REQ-037
+    title: The system shall permit publishers to make specifications queryable, present verification evidence or proofs upon request under the applicable access restrictions, and sell access to the concrete implementation, granting implementation access only to an authorized requester.
+    satisfies: [UN-001, UN-002, UN-003]
+
+  - id: REQ-038
+    title: Requested verification evidence or proofs shall identify the exact artifact CONTENT ADDRESS, specification, verified claims, and achieved rigor they concern; checking a claim shall not require disclosure of implementation content for which the requester lacks authorization, and undisclosed or unchecked evidence shall not be presented as independently checked by that requester.
+    satisfies: [UN-001, UN-002]
