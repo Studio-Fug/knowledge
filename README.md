@@ -167,6 +167,31 @@ actually verified without reading the entire artifact. Overall full verification
 against the specification does not automatically verify additional capabilities or constraints
 inferred from the design (REQ-034).
 
+## Agreed search scope and commercial access
+
+Semantic search supports both local and configured remote caches, with a
+selectable scope. Results identify their source cache and artifact address
+(REQ-035). No default search scope has been selected.
+
+Publishers may expose queryable specifications and semantic discovery data,
+present verification evidence or proofs on request, and sell access to concrete
+implementations. These disclosures have separate access controls. Knowing an
+artifact address does not authorize retrieval of restricted content, and remote
+substitution must respect those restrictions (REQ-036 and REQ-037).
+
+Evidence or proofs identify the exact artifact, specification, claims, and
+rigor they concern. Checking a claim must not require unauthorized disclosure
+of implementation content. Publisher claims and verification independently
+checked by a requester must remain distinguishable (REQ-038).
+
+The economic aim is to make costly verification reusable through inexpensive
+checking. Zero-knowledge proofs derived from reports and artifacts are the
+preferred direction to investigate; the proof statement, mechanism, and cost
+targets remain open. Specifications, evidence, and implementations remain
+constituents of the same artifact, with controlled partial disclosure rather
+than additional first-class object types. Public portions and proofs must be
+bound to the artifact's content address; no object data is exempt from hashing.
+
 ## Remaining decisions to make together
 
 1. What deterministic manifest format and byte encoding shall be hashed?
