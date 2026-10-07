@@ -56,3 +56,7 @@ requirements:
   - id: REQ-012
     title: Selection, retrieval for reuse, and dependency resolution shall require fully verified IMPLEMENTATIONs by default; using any other IMPLEMENTATION shall require an explicit opt-in and shall preserve its verification status in the returned artifact, including when retrieved from another CACHE.
     satisfies: [UN-001, UN-002]
+
+  - id: REQ-013
+    title: The system shall classify an IMPLEMENTATION as fully verified only when every IMPLEMENTATION it references, directly or transitively, is also fully verified; a dependency with missing, incomplete, failed, stale, or unknown verification shall prevent that classification.
+    satisfies: [UN-001, UN-002]
