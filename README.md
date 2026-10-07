@@ -329,6 +329,19 @@ Browsing and search summaries expose claim scope and support filtering by these
 scopes, subject to access restrictions. Scope identifiers and evidence remain
 hashed constituent data of artifacts, not new first-class objects (REQ-059).
 
+## Interfaces and repository scope
+
+The initial interfaces are an agent-friendly API and CLI, with machine-readable
+inputs, results, verification summaries, and errors. The API supports the
+operations required by both agent and human clients (REQ-060).
+
+A human browser follows later as a client in a separate repository, supporting
+the same use cases through the API. It includes discovery and filters, artifact
+and evidence inspection, provenance, access-controlled retrieval, publication,
+and re-verification submission. It is not a first-class feature of this core
+repository and introduces no browser-only core operations or database object
+types (REQ-061). The browser repository has not yet been created.
+
 ## Remaining decisions to make together
 
 1. What deterministic manifest format and byte encoding shall be hashed?
