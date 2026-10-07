@@ -155,16 +155,16 @@ predecessor link to the previous artifact's hash, then hashing the new artifact.
 The previous artifact remains unchanged; the revision introduces no additional
 first-class object type (REQ-032).
 
-Each semantic capability exposes a machine-readable verification status.
-Verified capabilities trace to passing, applicable report evidence covering
+Each semantic capability and constraint exposes a machine-readable verification
+status. Verified capabilities and constraints trace to passing, applicable report evidence covering
 the claim and its stated conditions, with the method and achieved rigor exposed.
 Inference without sufficient evidence is distinguished from verification
 (REQ-033).
 
 Browsing and search summaries expose these statuses and evidence references,
-and searches can filter by verified capability. An agent can identify what is
+and searches can filter by verified capabilities and constraints. An agent can identify what is
 actually verified without reading the entire artifact. Overall full verification
-against the specification does not automatically verify additional capabilities
+against the specification does not automatically verify additional capabilities or constraints
 inferred from the design (REQ-034).
 
 ## Remaining decisions to make together
