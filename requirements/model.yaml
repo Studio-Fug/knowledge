@@ -128,3 +128,11 @@ requirements:
   - id: REQ-030
     title: A CACHE shall validate retrieved artifact content against the requested SHA-256 CONTENT ADDRESS before accepting it for local storage or use; content whose computed address does not match shall be rejected and shall not satisfy the retrieval request.
     satisfies: [UN-001, UN-002]
+
+  - id: REQ-031
+    title: A SEMANTIC DECOMPOSITION shall describe capabilities and constraints extractable from the REQUIREMENT SPECIFICATION and the IMPLEMENTATION, including capabilities and constraints inferred by examining the concrete design rather than only its specification's terminology; the system shall support querying these descriptions to discover equivalent capabilities and distinguish relevant constraints.
+    satisfies: [UN-001, UN-003]
+
+  - id: REQ-032
+    title: The system shall permit revision of an artifact's SEMANTIC DECOMPOSITION as model capability or understanding of capabilities and constraints improves; each revision shall create a new REQUIREMENTS-TO-IMPLEMENTATION ARTIFACT containing the updated decomposition and a predecessor reference to the previous artifact's CONTENT ADDRESS, and shall compute a new CONTENT ADDRESS covering the updated data and predecessor reference without modifying the previous artifact.
+    satisfies: [UN-001, UN-002, UN-003]
