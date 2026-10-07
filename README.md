@@ -27,7 +27,8 @@ a draft for discussion, not a claim that the system satisfies them.
 - **CONTENT ADDRESS**: a SHA-256 identifier for a database entry.
 - **CACHE**: an instance of the system, addressable by internet address and port.
 - **SEMANTIC DECOMPOSITION**: a representation used to discover requirement
-  specifications by meaning. Its structure is still to be defined.
+  specifications and implementations by capabilities and constraints extracted
+  from the specification and concrete design. Its encoding remains to be defined.
 
 ## Agreed verification behavior
 
@@ -140,13 +141,26 @@ Retrieved content must be validated against the requested SHA-256 content
 address before it is accepted for local storage or use. Mismatched content is
 rejected and does not satisfy the request (REQ-030).
 
+## Agreed semantic decomposition and revision
+
+Semantic decompositions describe capabilities and constraints extractable from
+both the specification and implementation. For example, "moves water" may group
+pumps, buckets, and aqueducts, while "requires electrical power" or "supports
+continuous flow" distinguishes designs. Labels may be inferred by examining
+the concrete design, beyond the terminology in its specification (REQ-031).
+
+As model capability or understanding improves, semantic labels may be revised
+by creating a new artifact containing the updated decomposition and a
+predecessor link to the previous artifact's hash, then hashing the new artifact.
+The previous artifact remains unchanged; the revision introduces no additional
+first-class object type (REQ-032).
+
 ## Remaining decisions to make together
 
 1. What deterministic manifest format and byte encoding shall be hashed?
 2. When must implementation references become build dependencies? Is Bazel the
    first supported build system or just an example?
-3. What is a semantic decomposition, and what search results count as correct
-   for the pump/aqueduct/bucket example?
+3. How shall semantic capabilities and constraints be encoded and matched?
 
 The guiding design preference is to keep the system as simple as possible.
 Storage formats, protocols, search machinery, and build integration remain open
