@@ -233,6 +233,22 @@ of build-system-specific integration data. Additional integrations can use the
 same dependency model; any integration data stored in an artifact participates
 in its hash (REQ-044).
 
+## Reproducible verification procedures
+
+Each artifact includes a well-written standard operating procedure for
+reproducing its verification. As applicable, it covers build instructions,
+tools and dependencies, equipment and setup, inputs and test conditions,
+ordered steps or commands, acceptance criteria, evidence capture, and traces
+to the specification. Physical procedures are included where commands alone
+are insufficient. Missing necessary instructions are explicit remaining
+verification work and prevent full verification (REQ-045).
+
+The procedure can assume ordinary domain knowledge and reference established
+procedures instead of restating general background. Necessary references
+identify the applicable revision and are available to the authorized recipient;
+artifact instructions and reference identifiers are included in the hash
+(REQ-046).
+
 ## Remaining decisions to make together
 
 1. What deterministic manifest format and byte encoding shall be hashed?
