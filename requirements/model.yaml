@@ -58,5 +58,17 @@ requirements:
     satisfies: [UN-001, UN-002]
 
   - id: REQ-013
-    title: The system shall classify an IMPLEMENTATION as fully verified only when every IMPLEMENTATION it references, directly or transitively, is also fully verified; a dependency with missing, incomplete, failed, stale, or unknown verification shall prevent that classification.
+    title: The system shall classify an IMPLEMENTATION as fully verified only when every IMPLEMENTATION it depends on, directly or transitively, is also fully verified; a dependency with missing, incomplete, failed, stale, or unknown verification shall prevent that classification. Version-history references shall not constitute implementation dependencies.
+    satisfies: [UN-001, UN-002]
+
+  - id: REQ-014
+    title: The system shall compute an IMPLEMENTATION's CONTENT ADDRESS as the SHA-256 of a deterministic manifest identifying its REQUIREMENT SPECIFICATION, concrete design files, VERIFICATION REPORT and evidence, implementation dependencies, and version-history predecessor by their content addresses where present.
+    satisfies: [UN-001, UN-002]
+
+  - id: REQ-015
+    title: Database objects shall be immutable; changes to evidence, features, requirements, or composition shall produce a distinct object with a new CONTENT ADDRESS without modifying the previous object.
+    satisfies: [UN-001, UN-002]
+
+  - id: REQ-016
+    title: Each new version of a database object shall include its previous version's CONTENT ADDRESS in the content used to compute its own CONTENT ADDRESS, forming an explicit traversable hash-linked history; an initial version shall have no predecessor.
     satisfies: [UN-001, UN-002]
