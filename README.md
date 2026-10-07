@@ -87,9 +87,12 @@ authoritative or guarantee that an agent will reproduce the same conclusions.
 
 Requirements-to-implementation artifacts are the only first-class objects
 (REQ-020). Reports, evidence, semantic decompositions, and provenance metadata
-belong to these artifacts. An agent's inference is persisted as a database entry
-only when it produces a new requirements-to-implementation artifact; standalone
-reasoning or provenance accounts are not database objects (REQ-021).
+belong to these artifacts. An agent's inference is included only as constituent
+data of a new requirements-to-implementation artifact, and only when it
+contributes to that artifact's traceability. Inference that does not contribute
+to traceability is omitted. Producing a new artifact does not by itself justify
+including the inference; standalone reasoning or provenance accounts are not
+database objects (REQ-021).
 
 ## Remaining decisions to make together
 
