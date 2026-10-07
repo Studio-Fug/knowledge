@@ -98,16 +98,25 @@ The same requirement specification may appear in multiple artifacts with
 different implementations. Each alternative retains its own verification
 report, content address, and provenance history (REQ-022).
 
+The same concrete design may also satisfy different specifications, represented
+as separate artifacts. Each artifact must provide verification tracing the
+design to its particular specification (REQ-023).
+
+Evidence cached in an existing artifact may be reused directly when it applies
+to the concrete design and covers the new specification's full traceability
+requirements. The new artifact contains the reused evidence and its trace to
+the new specification. Its verification status is determined against that
+specification rather than inherited from the source artifact (REQ-024).
+
 ## Remaining decisions to make together
 
 1. What evidence and verification rigor does each requirement demand?
 2. What deterministic manifest format and byte encoding shall be hashed?
-3. Can one implementation satisfy multiple specifications?
-4. When must implementation references become build dependencies? Is Bazel the
+3. When must implementation references become build dependencies? Is Bazel the
    first supported build system or just an example?
-5. How are remote caches selected, and must retrieved content be checked
+4. How are remote caches selected, and must retrieved content be checked
    against the requested SHA-256 before use?
-6. What is a semantic decomposition, and what search results count as correct
+5. What is a semantic decomposition, and what search results count as correct
    for the pump/aqueduct/bucket example?
 
 The guiding design preference is to keep the system as simple as possible.
