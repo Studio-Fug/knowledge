@@ -196,3 +196,11 @@ requirements:
   - id: REQ-047
     title: The system shall expose inclusion or exclusion of superseded artifact versions as an agent-configurable browsing and search filter; filtering shall preserve access to version history and shall support multiple current branches without assuming a single universally latest artifact.
     satisfies: [UN-001, UN-003]
+
+  - id: REQ-048
+    title: Published artifacts shall carry a cryptographic publisher signature binding the publishing identity to the exact artifact content; the system shall expose the signing public key or its identifier and signature validation result so recipients can authenticate the publisher, including when artifacts are obtained from another CACHE.
+    satisfies: [UN-001, UN-002]
+
+  - id: REQ-049
+    title: The system shall distinguish authenticated publisher identity from verification of the artifact's claims; a valid publisher signature shall not by itself establish evidence truthfulness, reproduction fidelity, verifier independence, or a trusted real-world identity.
+    satisfies: [UN-001]
