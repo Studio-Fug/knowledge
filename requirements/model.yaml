@@ -212,3 +212,11 @@ requirements:
   - id: REQ-051
     title: Signature validation shall recompute the payload hash and validate the publisher signature against it, while content-address validation shall recompute the hash of the complete artifact; all dependency and predecessor references shall identify artifacts by their final CONTENT ADDRESSes, and changes to the payload, signature, or signing metadata shall produce a new artifact address.
     satisfies: [UN-001, UN-002]
+
+  - id: REQ-052
+    title: Access grants and revocations shall be mutable CACHE configuration associated with requester identities and artifact CONTENT ADDRESSes rather than constituent artifact data or additional first-class database objects; changing access permissions shall not modify the artifact, its publisher identity, or its CONTENT ADDRESS.
+    satisfies: [UN-001, UN-002]
+
+  - id: REQ-053
+    title: The commercial mechanism shall charge for authorized access to artifact content rather than ownership of the ideas represented; each CACHE shall enforce its applicable grants and revocations for subsequent access requests, including requests for evidence and concrete implementations.
+    satisfies: [UN-001, UN-002]
