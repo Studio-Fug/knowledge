@@ -236,3 +236,11 @@ requirements:
   - id: REQ-057
     title: The system shall permit an integrator to verify previously unverified components, reject failing components, and include selected passing components in a fully verified assembly when the resulting evidence covers the assembly's specification; the report and SOP shall identify the tested scope and applicable component selection or screening conditions, and shall not imply verification of untested components or units.
     satisfies: [UN-001]
+
+  - id: REQ-058
+    title: VERIFICATION REPORTs shall explicitly distinguish design, batch, and individual-unit verification and identify the applicable design revision, batch or lot, or individual unit as appropriate; each claim and its supporting evidence shall state its applicable scope, and verification at one scope shall not automatically establish verification at another.
+    satisfies: [UN-001, UN-003]
+
+  - id: REQ-059
+    title: Browsing and search summaries shall expose the scope of verification claims and support filtering by design, batch, or individual-unit verification, subject to access restrictions; scope identifiers and evidence shall remain constituent data of REQUIREMENTS-TO-IMPLEMENTATION ARTIFACTs covered by their CONTENT ADDRESSes rather than additional first-class object types.
+    satisfies: [UN-001, UN-003]
