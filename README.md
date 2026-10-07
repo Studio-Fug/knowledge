@@ -249,6 +249,13 @@ identify the applicable revision and are available to the authorized recipient;
 artifact instructions and reference identifiers are included in the hash
 (REQ-046).
 
+## Version filtering
+
+Agents can configure whether browsing and search include superseded artifact
+versions. History remains accessible, and multiple current branches are
+supported without assuming a single universally latest artifact (REQ-047).
+No default for this filter has been selected.
+
 ## Remaining decisions to make together
 
 1. What deterministic manifest format and byte encoding shall be hashed?
