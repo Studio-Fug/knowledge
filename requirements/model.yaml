@@ -62,7 +62,7 @@ requirements:
     satisfies: [UN-001, UN-002]
 
   - id: REQ-014
-    title: The system shall compute an IMPLEMENTATION's CONTENT ADDRESS as the SHA-256 of a deterministic manifest identifying its REQUIREMENT SPECIFICATION, concrete design files, VERIFICATION REPORT and evidence, implementation dependencies, and version-history predecessor by their content addresses where present.
+    title: The system shall compute an IMPLEMENTATION's CONTENT ADDRESS as the SHA-256 of a deterministic manifest identifying its REQUIREMENT SPECIFICATION, concrete design files, VERIFICATION REPORT and evidence, implementation dependencies, and version-history predecessors by their content addresses where present.
     satisfies: [UN-001, UN-002]
 
   - id: REQ-015
@@ -70,5 +70,5 @@ requirements:
     satisfies: [UN-001, UN-002]
 
   - id: REQ-016
-    title: Each new version of a database object shall include its previous version's CONTENT ADDRESS in the content used to compute its own CONTENT ADDRESS, forming an explicit traversable hash-linked history; an initial version shall have no predecessor.
+    title: Each derived version of a database object shall record the CONTENT ADDRESSes of one or more predecessor objects that contributed conceptually to its production, and shall include all of those addresses in the content used to compute its own CONTENT ADDRESS, forming an explicit traversable provenance graph; an initial object with no predecessors shall record an empty predecessor set.
     satisfies: [UN-001, UN-002]
