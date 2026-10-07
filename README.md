@@ -123,15 +123,20 @@ Achieved rigor is queryable alongside semantic requirements. For example,
 distinguish physical construction and testing evidence from simulation alone.
 Results expose the scope covered by the qualifying evidence (REQ-027).
 
+When the specification demands no particular rigor, passing simulation evidence
+may establish full verification if it covers every requirement for the concrete
+design and meets the other full-verification conditions, including dependency
+verification. Fully verified does not imply physically built or tested; those
+remain separate evidence-based query dimensions (REQ-028).
+
 ## Remaining decisions to make together
 
-1. When rigor is unspecified, what evidence suffices for full verification?
-2. What deterministic manifest format and byte encoding shall be hashed?
-3. When must implementation references become build dependencies? Is Bazel the
+1. What deterministic manifest format and byte encoding shall be hashed?
+2. When must implementation references become build dependencies? Is Bazel the
    first supported build system or just an example?
-4. How are remote caches selected, and must retrieved content be checked
+3. How are remote caches selected, and must retrieved content be checked
    against the requested SHA-256 before use?
-5. What is a semantic decomposition, and what search results count as correct
+4. What is a semantic decomposition, and what search results count as correct
    for the pump/aqueduct/bucket example?
 
 The guiding design preference is to keep the system as simple as possible.
