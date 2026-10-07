@@ -160,3 +160,11 @@ requirements:
   - id: REQ-038
     title: Requested verification evidence or proofs shall identify the exact artifact CONTENT ADDRESS, specification, verified claims, and achieved rigor they concern; checking a claim shall not require disclosure of implementation content for which the requester lacks authorization, and undisclosed or unchecked evidence shall not be presented as independently checked by that requester.
     satisfies: [UN-001, UN-002]
+
+  - id: REQ-039
+    title: The system shall permit an authorized recipient of a concrete implementation to independently rerun its validation checks and contribute the resulting report and evidence by producing a new REQUIREMENTS-TO-IMPLEMENTATION ARTIFACT linked to the original artifact as a predecessor; the new evidence shall identify the exact specification and design checked, the checks and conditions, results, and verifying party, without modifying the original artifact.
+    satisfies: [UN-001, UN-002]
+
+  - id: REQ-040
+    title: Verification evidence shall distinguish publisher-supplied results from recipient or third-party re-verification and expose the provenance and scope of each report; the system shall not treat a valid content hash, cryptographic proof, or claimed independent report alone as establishing the truth of physical measurements or the independence of the reporting party.
+    satisfies: [UN-001, UN-003]
