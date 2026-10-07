@@ -244,3 +244,11 @@ requirements:
   - id: REQ-059
     title: Browsing and search summaries shall expose the scope of verification claims and support filtering by design, batch, or individual-unit verification, subject to access restrictions; scope identifiers and evidence shall remain constituent data of REQUIREMENTS-TO-IMPLEMENTATION ARTIFACTs covered by their CONTENT ADDRESSes rather than additional first-class object types.
     satisfies: [UN-001, UN-003]
+
+  - id: REQ-060
+    title: The system shall initially provide an agent-friendly API and CLI with machine-readable inputs, results, verification summaries, and errors for its supported use cases; the API shall expose the operations needed by both agent and human clients without requiring a graphical interface.
+    satisfies: [UN-001, UN-002, UN-003]
+
+  - id: REQ-061
+    title: A subsequent human browser shall be a client maintained in a separate repository and shall support the same use cases through the system API, including discovery, configurable filters, artifact and evidence inspection, provenance traversal, access-controlled retrieval, publication, and re-verification submission; the browser shall not introduce additional first-class database objects or require browser-only core operations.
+    satisfies: [UN-001, UN-002, UN-003]
