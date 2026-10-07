@@ -15,6 +15,11 @@ a draft for discussion, not a claim that the system satisfies them.
 
 ## Working definitions
 
+- **REQUIREMENTS-TO-IMPLEMENTATION ARTIFACT**: the sole first-class database
+  object, pairing a requirement specification with an implementation. Its
+  specification, design, report, evidence, semantic decomposition, and provenance
+  are constituent data. Content addresses identify whole artifacts; dependency
+  and predecessor links refer to whole artifacts.
 - **REQUIREMENT SPECIFICATION**: the description of what a design must satisfy.
 - **IMPLEMENTATION**: a concrete design together with its verification report.
 - **VERIFICATION REPORT**: an artifact tracing a concrete design to its
@@ -44,10 +49,10 @@ classified as fully verified.
 
 ## Agreed content addressing and history
 
-An implementation's content address is the SHA-256 of a deterministic manifest
+A requirements-to-implementation artifact's content address is the SHA-256 of a deterministic manifest
 covering all of its data, including its specification, design files, verification
 report and evidence, semantic decomposition, dependencies, predecessors, and
-display-only explanations. Referenced content is identified by content address. The precise
+display-only explanations. Referenced artifacts are identified by content address. The precise
 manifest format and byte encoding remain to be defined.
 
 Objects are immutable. New evidence, features, requirements, or changes in
@@ -77,6 +82,14 @@ object and hash. No object metadata sits outside this coverage (REQ-019).
 This preserves the exact data available to an agent for reproducing an
 inference chain. Hash coverage preserves inputs; it does not make explanations
 authoritative or guarantee that an agent will reproduce the same conclusions.
+
+## Agreed database scope
+
+Requirements-to-implementation artifacts are the only first-class objects
+(REQ-020). Reports, evidence, semantic decompositions, and provenance metadata
+belong to these artifacts. An agent's inference is persisted as a database entry
+only when it produces a new requirements-to-implementation artifact; standalone
+reasoning or provenance accounts are not database objects (REQ-021).
 
 ## Remaining decisions to make together
 
