@@ -62,7 +62,7 @@ requirements:
     satisfies: [UN-001, UN-002]
 
   - id: REQ-014
-    title: The system shall compute an IMPLEMENTATION's CONTENT ADDRESS as the SHA-256 of a deterministic manifest identifying its REQUIREMENT SPECIFICATION, concrete design files, VERIFICATION REPORT and evidence, implementation dependencies, and version-history predecessors by their content addresses where present.
+    title: The system shall compute an IMPLEMENTATION's CONTENT ADDRESS as the SHA-256 of a deterministic manifest covering all of its data, including its REQUIREMENT SPECIFICATION, concrete design files, VERIFICATION REPORT and evidence, SEMANTIC DECOMPOSITION, implementation dependencies, version-history predecessors, and display-only predecessor explanations, with referenced content identified by CONTENT ADDRESS.
     satisfies: [UN-001, UN-002]
 
   - id: REQ-015
@@ -80,3 +80,7 @@ requirements:
   - id: REQ-018
     title: Agents deriving a provenance account shall examine the linked objects' REQUIREMENT SPECIFICATIONs, IMPLEMENTATIONs, and SEMANTIC DECOMPOSITIONs and draw their own conclusions about lineage rather than treating predecessor explanations as authoritative evidence.
     satisfies: [UN-001, UN-003]
+
+  - id: REQ-019
+    title: Every bit of stored data belonging to a database object shall be covered by its CONTENT ADDRESS, directly or through content-addressed references; no object metadata, including display-only or non-authoritative data, shall exist outside that coverage, and changing any such data shall produce a distinct object with a new CONTENT ADDRESS.
+    satisfies: [UN-001, UN-002]
