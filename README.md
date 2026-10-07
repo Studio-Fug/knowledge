@@ -222,11 +222,21 @@ The initial scope is this evidence mechanism. Reputation scoring and policies
 for resolving disputes are deferred until practical experience informs them;
 they are not prerequisites for submitting or retrieving re-verification.
 
+## Initial build integration
+
+Bazel and Nix are the initial supported integrations for expanding
+content-addressed implementation dependencies into build-system relationships.
+Other build systems may be added later (REQ-043).
+
+Dependency relationships identify artifacts by content address independently
+of build-system-specific integration data. Additional integrations can use the
+same dependency model; any integration data stored in an artifact participates
+in its hash (REQ-044).
+
 ## Remaining decisions to make together
 
 1. What deterministic manifest format and byte encoding shall be hashed?
-2. When must implementation references become build dependencies? Is Bazel the
-   first supported build system or just an example?
+2. What integration data is required to resolve dependencies in Bazel and Nix?
 3. How shall semantic capabilities and constraints be encoded and matched?
 
 The guiding design preference is to keep the system as simple as possible.
