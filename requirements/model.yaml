@@ -1,0 +1,46 @@
+# Initial requirements draft. IDs remain stable as wording evolves.
+# Verification evidence will be added as the system is implemented.
+user_needs:
+  - id: UN-001
+    title: Find and reuse concrete designs with traceable verification
+  - id: UN-002
+    title: Retrieve reusable designs across distributed caches
+  - id: UN-003
+    title: Discover designs by meaning despite differences in terminology
+
+requirements:
+  - id: REQ-001
+    title: The system shall implement a database mapping REQUIREMENT SPECIFICATIONs to IMPLEMENTATIONs.
+    satisfies: [UN-001]
+
+  - id: REQ-002
+    title: An IMPLEMENTATION shall contain a concrete design (source code, PCB layouts, etc.), together with a VERIFICATION REPORT.
+    satisfies: [UN-001]
+
+  - id: REQ-003
+    title: A VERIFICATION REPORT shall be a complete artifact showing traceability of the concrete design to the REQUIREMENT SPECIFICATION.
+    satisfies: [UN-001]
+
+  - id: REQ-004
+    title: Every entry in the database shall have a CONTENT ADDRESS (SHA-256).
+    satisfies: [UN-001, UN-002]
+
+  - id: REQ-005
+    title: An IMPLEMENTATION may reference other IMPLEMENTATIONs by their CONTENT ADDRESSes; the system shall expand these references, where necessary, into build system relationships (such as Bazel MODULE dependencies).
+    satisfies: [UN-001]
+
+  - id: REQ-006
+    title: The system shall support distributed deployment; an instance of the system is known as a CACHE.
+    satisfies: [UN-002]
+
+  - id: REQ-007
+    title: A CACHE may be referred to by its internet address together with a port number.
+    satisfies: [UN-002]
+
+  - id: REQ-008
+    title: If a CONTENT ADDRESS is not available in the local CACHE, the system shall support retrieving the corresponding entry from another CACHE (as with Nix substituters).
+    satisfies: [UN-002]
+
+  - id: REQ-009
+    title: The system shall support fuzzy search of REQUIREMENT SPECIFICATIONs via a SEMANTIC DECOMPOSITION, including discovering systems that implement a method for moving water when described as pump, aqueduct, bucket, or equivalent terms.
+    satisfies: [UN-003]
