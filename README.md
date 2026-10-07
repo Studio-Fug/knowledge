@@ -360,6 +360,26 @@ hash-linked history. The cache requires no built-in decomposition generator or
 particular model provider; accepting a decomposition does not establish that
 its claims are verified (REQ-064).
 
+## Host-provided payments and uniform access workflow
+
+Hosts bring their own payment infrastructure through an integration hook. The
+core does not process payments or require a particular provider (REQ-065).
+
+Payment for access is a first-class API workflow: initiate a request, receive a
+stable request identifier and host-provided payment instructions, then query or
+wait for clearance and access status through provider-independent operations
+(REQ-066).
+
+Requests bind requester identity, artifact address, requested access scope, and
+quoted terms. Access follows host-confirmed clearance. Pending, cleared,
+unsuccessful, and access-grant outcomes remain distinguishable; retries and
+duplicate notifications must not cause unintended duplicate charges or grants
+(REQ-067).
+
+Payment and clearance state are cache operational state, alongside access
+grants, rather than new artifact database object types. They do not change
+artifact hashes or expand the purchased scope (REQ-068).
+
 ## Remaining decisions to make together
 
 1. What deterministic manifest format and byte encoding shall be hashed?
