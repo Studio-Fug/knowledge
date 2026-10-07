@@ -18,7 +18,7 @@ requirements:
     satisfies: [UN-001]
 
   - id: REQ-003
-    title: A VERIFICATION REPORT shall be a complete artifact showing traceability of the concrete design to the REQUIREMENT SPECIFICATION.
+    title: A VERIFICATION REPORT shall show traceability of the concrete design to the REQUIREMENT SPECIFICATION and explicitly identify remaining verification work, including missing evidence and failed verification.
     satisfies: [UN-001]
 
   - id: REQ-004
@@ -44,3 +44,15 @@ requirements:
   - id: REQ-009
     title: The system shall support fuzzy search of REQUIREMENT SPECIFICATIONs via a SEMANTIC DECOMPOSITION, including discovering systems that implement a method for moving water when described as pump, aqueduct, bucket, or equivalent terms.
     satisfies: [UN-003]
+
+  - id: REQ-010
+    title: The database shall permit storage of IMPLEMENTATIONs with incomplete verification evidence.
+    satisfies: [UN-001]
+
+  - id: REQ-011
+    title: The system shall expose a machine-readable verification status for each IMPLEMENTATION and shall classify it as fully verified only when passing evidence covers every requirement in its REQUIREMENT SPECIFICATION for that concrete design; missing, failed, or stale evidence shall prevent that classification.
+    satisfies: [UN-001]
+
+  - id: REQ-012
+    title: Selection, retrieval for reuse, and dependency resolution shall require fully verified IMPLEMENTATIONs by default; using any other IMPLEMENTATION shall require an explicit opt-in and shall preserve its verification status in the returned artifact, including when retrieved from another CACHE.
+    satisfies: [UN-001, UN-002]
