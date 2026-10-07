@@ -116,3 +116,7 @@ requirements:
   - id: REQ-027
     title: The system shall support querying artifacts by achieved verification rigor in combination with semantic requirement search, including finding smart faucet designs supported by evidence of physical construction and testing while excluding designs supported only by simulation; results shall expose which requirements and design elements the qualifying evidence covers.
     satisfies: [UN-001, UN-003]
+
+  - id: REQ-028
+    title: When a REQUIREMENT SPECIFICATION demands no particular verification rigor, passing simulation evidence may establish full verification if it covers every requirement for the concrete design and all other full-verification conditions are met; this classification shall not imply physical construction or testing, which shall remain a separate evidence-based query dimension.
+    satisfies: [UN-001, UN-003]
