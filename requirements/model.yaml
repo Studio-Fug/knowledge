@@ -138,9 +138,9 @@ requirements:
     satisfies: [UN-001, UN-002, UN-003]
 
   - id: REQ-033
-    title: Each capability in an artifact's SEMANTIC DECOMPOSITION shall expose a machine-readable verification status distinguishing evidence-supported verification from inference without sufficient evidence; a verified capability shall trace to passing, applicable evidence in the VERIFICATION REPORT that covers the claim and its stated conditions, and shall expose the verification method and achieved rigor.
+    title: Each capability and constraint in an artifact's SEMANTIC DECOMPOSITION shall expose a machine-readable verification status distinguishing evidence-supported verification from inference without sufficient evidence; a verified capability or constraint shall trace to passing, applicable evidence in the VERIFICATION REPORT that covers the claim and its stated conditions, and shall expose the verification method and achieved rigor.
     satisfies: [UN-001, UN-003]
 
   - id: REQ-034
-    title: Browsing and semantic search results shall expose capability-level verification statuses and evidence references in their summaries so agents can identify verified capabilities without inspecting the entire artifact; the system shall support filtering by verified capability and shall not infer verification of every semantic capability from an artifact's overall fully verified status.
+    title: Browsing and semantic search results shall expose verification statuses and evidence references for individual capabilities and constraints in their summaries so agents can identify verified claims without inspecting the entire artifact; the system shall support filtering by verified capabilities and constraints and shall not infer verification of every semantic capability or constraint from an artifact's overall fully verified status.
     satisfies: [UN-001, UN-003]
