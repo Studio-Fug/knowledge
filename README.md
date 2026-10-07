@@ -392,6 +392,18 @@ an explicit grant for the new hash and scope and reports payment as not required
 rather than claiming a transaction cleared. Provenance links alone grant no
 entitlement (REQ-070).
 
+## Requester authentication
+
+Requester identities are public keys or unambiguous public-key identifiers.
+Agents authenticate protected requests with signatures, which caches validate
+without a central account service. Grants, payment requests, and upgrade
+eligibility bind to the authenticated identity (REQ-071).
+
+Request signatures bind the operation, target cache, applicable artifact and
+scope, and request content, with freshness and replay protection. Possession
+of a public key or purchaser identifier alone does not authorize access
+(REQ-072). Key rotation and recovery policy remain to be defined.
+
 ## Remaining decisions to make together
 
 1. What deterministic manifest format and byte encoding shall be hashed?
