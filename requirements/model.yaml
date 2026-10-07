@@ -62,7 +62,7 @@ requirements:
     satisfies: [UN-001, UN-002]
 
   - id: REQ-014
-    title: The system shall compute a REQUIREMENTS-TO-IMPLEMENTATION ARTIFACT's CONTENT ADDRESS as the SHA-256 of a deterministic manifest covering all of its data, including its REQUIREMENT SPECIFICATION, concrete design files, VERIFICATION REPORT and evidence, SEMANTIC DECOMPOSITION, implementation dependencies, version-history predecessors, and display-only predecessor explanations, with referenced artifacts identified by CONTENT ADDRESS.
+    title: The system shall compute a REQUIREMENTS-TO-IMPLEMENTATION ARTIFACT's CONTENT ADDRESS as the SHA-256 of its complete deterministic representation, covering its payload manifest and any publisher signature and signing metadata; the payload shall cover its REQUIREMENT SPECIFICATION, concrete design files, VERIFICATION REPORT and evidence, SEMANTIC DECOMPOSITION, implementation dependencies, version-history predecessors, and display-only predecessor explanations, with referenced artifacts identified by their final CONTENT ADDRESSes.
     satisfies: [UN-001, UN-002]
 
   - id: REQ-015
@@ -204,3 +204,11 @@ requirements:
   - id: REQ-049
     title: The system shall distinguish authenticated publisher identity from verification of the artifact's claims; a valid publisher signature shall not by itself establish evidence truthfulness, reproduction fidelity, verifier independence, or a trusted real-world identity.
     satisfies: [UN-001]
+
+  - id: REQ-050
+    title: To construct a signed artifact, the system shall compute the SHA-256 of its deterministic payload representation, obtain the publisher's signature over that payload hash, and compute the final CONTENT ADDRESS as the SHA-256 of the complete deterministic artifact containing the payload, signature, and signing metadata; the payload hash shall be an internal signing value rather than a separate first-class database object or retrieval address.
+    satisfies: [UN-001, UN-002]
+
+  - id: REQ-051
+    title: Signature validation shall recompute the payload hash and validate the publisher signature against it, while content-address validation shall recompute the hash of the complete artifact; all dependency and predecessor references shall identify artifacts by their final CONTENT ADDRESSes, and changes to the payload, signature, or signing metadata shall produce a new artifact address.
+    satisfies: [UN-001, UN-002]
