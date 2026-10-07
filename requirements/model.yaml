@@ -192,3 +192,7 @@ requirements:
   - id: REQ-046
     title: Verification procedures may rely on ordinary domain knowledge and precisely identified established procedures rather than restating general background; any referenced procedure necessary to reproduce verification shall identify the applicable revision and be available to the authorized recipient, with artifact-specific instructions and reference identifiers covered by the artifact's CONTENT ADDRESS.
     satisfies: [UN-001, UN-002]
+
+  - id: REQ-047
+    title: The system shall expose inclusion or exclusion of superseded artifact versions as an agent-configurable browsing and search filter; filtering shall preserve access to version history and shall support multiple current branches without assuming a single universally latest artifact.
+    satisfies: [UN-001, UN-003]
