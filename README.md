@@ -371,7 +371,7 @@ wait for clearance and access status through provider-independent operations
 (REQ-066).
 
 Requests bind requester identity, artifact address, requested access scope, and
-quoted terms. Access follows host-confirmed clearance. Pending, cleared,
+quoted terms. When payment is required, access follows host-confirmed clearance. Pending, cleared,
 unsuccessful, and access-grant outcomes remain distinguishable; retries and
 duplicate notifications must not cause unintended duplicate charges or grants
 (REQ-067).
@@ -379,6 +379,18 @@ duplicate notifications must not cause unintended duplicate charges or grants
 Payment and clearance state are cache operational state, alongside access
 grants, rather than new artifact database object types. They do not change
 artifact hashes or expand the purchased scope (REQ-068).
+
+## Exact-version grants and seller upgrades
+
+Access grants cover a specific artifact hash and scope. They do not
+automatically extend to earlier or later versions, alternatives, or dependencies
+(REQ-069).
+
+A seller-provided eligibility hook can recognize purchaser identity and prior
+purchases and short-circuit payment for an offered upgrade. The workflow issues
+an explicit grant for the new hash and scope and reports payment as not required,
+rather than claiming a transaction cleared. Provenance links alone grant no
+entitlement (REQ-070).
 
 ## Remaining decisions to make together
 
