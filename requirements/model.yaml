@@ -92,3 +92,7 @@ requirements:
   - id: REQ-021
     title: The system shall include an agent's inference only as constituent data of a new REQUIREMENTS-TO-IMPLEMENTATION ARTIFACT and only when that inference contributes to the artifact's traceability; inference that does not contribute to traceability shall be omitted, and the system shall not create standalone inference, reasoning, or provenance-account objects.
     satisfies: [UN-001]
+
+  - id: REQ-022
+    title: The database shall permit multiple REQUIREMENTS-TO-IMPLEMENTATION ARTIFACTs containing the same REQUIREMENT SPECIFICATION and different IMPLEMENTATIONs; each alternative shall retain its own VERIFICATION REPORT, CONTENT ADDRESS, and provenance history.
+    satisfies: [UN-001, UN-003]
