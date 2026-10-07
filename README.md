@@ -208,6 +208,20 @@ evidence remains a desired direction, with source authentication and trust
 assumptions unresolved. No reputation, payment arbitration, or consensus
 mechanism has yet been selected.
 
+A submission and retrieval hook supports recipient and third-party
+re-verification artifacts, including failed results. Conflicting reports linked
+to the original artifact are discoverable subject to access restrictions;
+reports remain parts of artifacts (REQ-041).
+
+Reports record reproduction procedures, environment and conditions, and known
+deviations from the original design or validation procedure. Unknown details
+remain explicit. Reproduction fidelity is not assumed, and a conflicting result
+alone does not establish which report is correct (REQ-042).
+
+The initial scope is this evidence mechanism. Reputation scoring and policies
+for resolving disputes are deferred until practical experience informs them;
+they are not prerequisites for submitting or retrieving re-verification.
+
 ## Remaining decisions to make together
 
 1. What deterministic manifest format and byte encoding shall be hashed?
