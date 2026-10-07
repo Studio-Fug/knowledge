@@ -220,3 +220,15 @@ requirements:
   - id: REQ-053
     title: The commercial mechanism shall charge for authorized access to artifact content rather than ownership of the ideas represented; each CACHE shall enforce its applicable grants and revocations for subsequent access requests, including requests for evidence and concrete implementations.
     satisfies: [UN-001, UN-002]
+
+  - id: REQ-054
+    title: A transaction for a physical article shall not grant access to its design or manufacturing know-how; the associated VERIFICATION REPORT may be disclosed under separately applicable permissions, and manufacturing know-how may be sold separately with independent pricing and permissions.
+    satisfies: [UN-001, UN-002]
+
+  - id: REQ-055
+    title: The system shall permit an integrator to offer a validated assembly supported by a VERIFICATION REPORT tracing to the assembly's REQUIREMENT SPECIFICATION without requiring disclosure of component designs, know-how, reports, or other component data to the requester; assembly purchase shall not automatically grant component access.
+    satisfies: [UN-001, UN-002]
+
+  - id: REQ-056
+    title: The commercial mechanism shall distinguish physical-article purchases from paid access to manufacturing know-how and shall permit compensation for assembly-validation work independently of component-validation work, without requiring bundled component access or attributing component-validation work to the integrator.
+    satisfies: [UN-001, UN-002]
