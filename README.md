@@ -280,6 +280,19 @@ and the final content address. Changes to payload, signature, or signing
 metadata change the final address. Every stored bit remains covered by hashing,
 without making the signature depend on a hash containing itself.
 
+## Mutable access policy
+
+Access grants and revocations are cache configuration associated with requester
+identities and artifact addresses. They are not artifact data or additional
+first-class database objects. Changing permissions leaves artifact content,
+publisher identity, and content address unchanged (REQ-052). This separates
+mutable access policy from the full hash coverage of artifact data.
+
+The commercial mechanism charges for access to artifact content, not ownership
+of the ideas. Each cache enforces applicable grants and revocations on subsequent
+access requests, including evidence and implementation requests (REQ-053).
+Revocation governs future access; it does not erase content already delivered.
+
 ## Remaining decisions to make together
 
 1. What deterministic manifest format and byte encoding shall be hashed?
