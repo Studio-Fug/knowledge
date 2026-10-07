@@ -404,6 +404,27 @@ scope, and request content, with freshness and replay protection. Possession
 of a public key or purchaser identifier alone does not authorize access
 (REQ-072). Key rotation and recovery policy remain to be defined.
 
+## Encrypted syndication
+
+Caches may syndicate offerings by distributing encrypted implementation
+content. Serving ciphertext does not grant plaintext access. Offerings identify
+the exact artifact, encrypted content, and controlling cache, to which access
+and payment requests are directed (REQ-073).
+
+The controlling cache authorizes and releases decryption keys to authenticated
+requesters after payment clearance or an approved bypass. Distribution caches
+do not acquire authority to grant decryption access simply by holding ciphertext
+(REQ-074).
+
+Encrypted content must be bound to the identified artifact and validated before
+acceptance; decrypted content must match its committed content before use.
+Encrypted artifact data and public encryption metadata participate in content
+addressing. Private decryption keys are protected operational secrets, not
+public artifact data (REQ-075). The precise encrypted representation and its
+relationship to the signed payload and final artifact hash remain to be defined.
+Ciphertext distribution is compatible with access restrictions because plaintext
+and keys remain controlled. Key release cannot retract copies already decrypted.
+
 ## Remaining decisions to make together
 
 1. What deterministic manifest format and byte encoding shall be hashed?
