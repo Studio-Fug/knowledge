@@ -274,9 +274,17 @@ requirements:
     satisfies: [UN-001, UN-002]
 
   - id: REQ-067
-    title: An access-payment request shall bind the requester, artifact CONTENT ADDRESS, requested content or access scope, and host's quoted terms; the CACHE shall grant the agreed access only after its payment integration confirms clearance, expose pending, cleared, unsuccessful, and access-grant outcomes distinctly, and handle retried requests or duplicate clearance notifications without unintended duplicate charges or grants.
+    title: An access-payment request shall bind the requester, artifact CONTENT ADDRESS, requested content or access scope, and host's quoted terms; when payment is required, the CACHE shall grant the agreed access only after its payment integration confirms clearance, expose pending, cleared, unsuccessful, and access-grant outcomes distinctly, and handle retried requests or duplicate clearance notifications without unintended duplicate charges or grants.
     satisfies: [UN-001, UN-002]
 
   - id: REQ-068
     title: Payment requests and transaction-clearance state shall be CACHE operational state rather than additional first-class artifact database objects; payment or access-state transitions shall not alter artifact content addresses or grant access beyond the agreed scope.
+    satisfies: [UN-001, UN-002]
+
+  - id: REQ-069
+    title: Each access grant shall identify a specific artifact CONTENT ADDRESS and access scope; a grant for one artifact shall not automatically authorize any predecessor, descendant, alternative version, or dependency.
+    satisfies: [UN-001, UN-002]
+
+  - id: REQ-070
+    title: The access-request workflow shall support a seller-provided eligibility hook that can recognize a purchaser's identity and prior purchases and bypass payment for an offered upgrade; approval shall issue an explicit grant for the new artifact CONTENT ADDRESS and agreed scope, expose that payment was not required rather than falsely report transaction clearance, and shall not make provenance links alone confer entitlement.
     satisfies: [UN-001, UN-002]
