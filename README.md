@@ -256,6 +256,21 @@ versions. History remains accessible, and multiple current branches are
 supported without assuming a single universally latest artifact (REQ-047).
 No default for this filter has been selected.
 
+## Publisher authentication
+
+Published artifacts carry a cryptographic signature binding the publisher's
+signing identity to the exact artifact content. The signing public key or its
+identifier and signature validation result are available to recipients,
+including across caches (REQ-048).
+
+A valid signature authenticates the signing identity; it does not establish
+the truth of verification claims, reproduction fidelity, independence, or a
+trusted real-world identity (REQ-049).
+
+The signed representation remains to be defined. It must reconcile signature
+inclusion with full hash coverage without making a signature depend on a hash
+that includes that same signature. No exception to REQ-019 has been agreed.
+
 ## Remaining decisions to make together
 
 1. What deterministic manifest format and byte encoding shall be hashed?
