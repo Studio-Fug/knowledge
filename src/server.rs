@@ -8,10 +8,14 @@ use std::{io::Read, net::SocketAddr};
 use tiny_http::{Header, Method, Request, Response, Server};
 
 pub fn bind(address: SocketAddr) -> Result<Server> {
-    if !address.ip().is_loopback() {
+    bind_with_network(address, false)
+}
+
+pub fn bind_with_network(address: SocketAddr, allow_network: bool) -> Result<Server> {
+    if !address.ip().is_loopback() && !allow_network {
         return Err(Error::new(
             "unsupported",
-            "prototype server only binds to loopback",
+            "non-loopback listeners require explicit --allow-network",
         ));
     }
     Server::http(address).map_err(|e| Error::new("io", e.to_string()))
@@ -37,7 +41,7 @@ fn route(request: &mut Request, cache: &Cache, publishers: &[String]) -> Result<
     let path = request.url().to_owned();
     match (method, path.as_str()) {
         (Method::Get, "/health") => {
-            Ok(br#"{"status":"ok","mode":"public_loopback_prototype"}"#.to_vec())
+            Ok(br#"{"status":"ok","mode":"public_cache"}"#.to_vec())
         }
         (Method::Get, path) if path.starts_with("/v1/artifacts/") => {
             canonical::encode(&cache.get(&path[14..])?)
@@ -86,7 +90,9 @@ pub fn handle(mut request: Request, cache: &Cache, publishers: &[String]) -> Res
 
 pub fn serve(server: Server, cache: &Cache, publishers: &[String]) -> Result<()> {
     for request in server.incoming_requests() {
-        handle(request, cache, publishers)?;
+        if let Err(error) = handle(request, cache, publishers) {
+            eprintln!("request failed: {error}");
+        }
     }
     Ok(())
 }

@@ -1,0 +1,16 @@
+services:
+  knowledge:
+    build: .
+    image: ${KNOWLEDGE_IMAGE:-knowledge:local}
+    environment:
+      KNOWLEDGE_PUBLISHERS: ${KNOWLEDGE_PUBLISHERS:-}
+    volumes:
+      - knowledge-data:/data
+    init: true
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+
+volumes:
+  knowledge-data:

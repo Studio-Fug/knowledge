@@ -22,7 +22,7 @@ use std::{
     about = "Content-addressed designs and traceable verification"
 )]
 struct Cli {
-    #[arg(long, default_value = ".knowledge", global = true)]
+    #[arg(long, env = "KNOWLEDGE_CACHE", default_value = ".knowledge", global = true)]
     cache: PathBuf,
     #[command(subcommand)]
     command: Command,
@@ -30,6 +30,11 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Command {
+    /// Check an HTTP cache without opening or locking local storage.
+    Healthcheck {
+        #[arg(long, default_value = "http://127.0.0.1:8787/health")]
+        url: String,
+    },
     /// Generate a private signing key; prints the public key only.
     Keygen {
         #[arg(long)]
@@ -86,11 +91,13 @@ enum Command {
         #[arg(long, default_value_t = 20)]
         limit: usize,
     },
-    /// Serve public artifacts and queries on loopback; read-only by default.
+    /// Serve public artifacts and queries; read-only and loopback by default.
     Serve {
-        #[arg(long, default_value = "127.0.0.1:8787")]
+        #[arg(long, env = "KNOWLEDGE_LISTEN", default_value = "127.0.0.1:8787")]
         listen: SocketAddr,
-        #[arg(long)]
+        #[arg(long, env = "KNOWLEDGE_ALLOW_NETWORK")]
+        allow_network: bool,
+        #[arg(long, env = "KNOWLEDGE_PUBLISHERS", value_delimiter = ',')]
         allow_publisher: Vec<String>,
     },
 }
@@ -115,6 +122,28 @@ fn print(value: &impl Serialize) -> Result<()> {
 
 fn run(cli: Cli) -> Result<()> {
     match cli.command {
+        Command::Healthcheck { url } => {
+            let response = ureq::AgentBuilder::new()
+                .timeout(std::time::Duration::from_secs(2))
+                .redirects(0)
+                .build()
+                .get(&url)
+                .call()
+                .map_err(|_| Error::new("unhealthy", "cache health endpoint is unavailable"))?;
+            if response.status() != 200 {
+                return Err(Error::new("unhealthy", "cache health endpoint did not return 200"));
+            }
+            let mut bytes = Vec::new();
+            response.into_reader().take(1025).read_to_end(&mut bytes)?;
+            if bytes.len() > 1024 {
+                return Err(Error::new("unhealthy", "health response exceeds limits"));
+            }
+            let status: serde_json::Value = canonical::parse(&bytes)?;
+            if status.get("status").and_then(serde_json::Value::as_str) != Some("ok") {
+                return Err(Error::new("unhealthy", "cache is not healthy"));
+            }
+            print(&status)
+        }
         Command::Keygen { output } => {
             let key = SigningKey::generate(&mut OsRng);
             let mut options = OpenOptions::new();
@@ -208,12 +237,14 @@ fn run(cli: Cli) -> Result<()> {
                 )?),
                 Command::Serve {
                     listen,
+                    allow_network,
                     allow_publisher,
                 } => {
+                    let allow_publisher: Vec<_> = allow_publisher.into_iter().filter(|p| !p.is_empty()).collect();
                     if allow_publisher.iter().any(|p| !canonical::is_hex(p, 32)) {
                         return Err(Error::new("invalid_key", "invalid allowed publisher"));
                     }
-                    let http = server::bind(listen)?;
+                    let http = server::bind_with_network(listen, allow_network)?;
                     eprintln!("knowledge listening on {listen}; public artifacts only");
                     server::serve(http, &cache, &allow_publisher)
                 }

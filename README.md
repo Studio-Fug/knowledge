@@ -13,4 +13,5 @@ catalog while controlling access to paid content.
 Initial Rust prototype: local cache, signed artifacts, search, and an agent API.
 
 [Design and decisions](docs/design.md) · [Requirements](requirements/) ·
-[Risk analysis](docs/risk-analysis.md) · [Run it](docs/implementation.md)
+[Risk analysis](docs/risk-analysis.md) · [Run it](docs/implementation.md) ·
+[Container](docs/containers.md)

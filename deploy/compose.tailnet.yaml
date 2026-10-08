@@ -1,0 +1,38 @@
+services:
+  tailscale:
+    image: ${TAILSCALE_IMAGE:-tailscale/tailscale:v1.104.1}
+    hostname: ${KNOWLEDGE_HOSTNAME:-knowledge}
+    environment:
+      TS_AUTHKEY: ${TS_AUTHKEY:-}
+      TS_AUTH_ONCE: "true"
+      TS_STATE_DIR: /var/lib/tailscale
+      TS_USERSPACE: "true"
+      TS_SERVE_CONFIG: /config/serve.json
+      TS_ENABLE_HEALTH_CHECK: "true"
+      TS_LOCAL_ADDR_PORT: "127.0.0.1:9002"
+    configs:
+      - source: tailscale-serve
+        target: /config/serve.json
+    volumes:
+      - tailscale-state:/var/lib/tailscale
+    healthcheck:
+      test: [CMD, wget, --spider, -q, "http://127.0.0.1:9002/healthz"]
+      interval: 5s
+      timeout: 3s
+      retries: 24
+    restart: unless-stopped
+  knowledge:
+    network_mode: service:tailscale
+    environment:
+      KNOWLEDGE_ALLOW_NETWORK: "false"
+    command: [serve, --listen, "127.0.0.1:8787"]
+    depends_on:
+      tailscale:
+        condition: service_healthy
+
+configs:
+  tailscale-serve:
+    file: ./deploy/tailscale/serve.json
+
+volumes:
+  tailscale-state:

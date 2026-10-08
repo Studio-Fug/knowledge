@@ -37,7 +37,9 @@ then put it into each applicable evidence record, then sign the payload.
 
 ## Agent API
 
-The server defaults to `127.0.0.1:8787` and rejects non-loopback listeners. It is
+The server defaults to `127.0.0.1:8787`; a non-loopback listener requires explicit
+`--allow-network`. The [container setup](containers.md) configures this for ordinary
+containers, or keeps the server on loopback behind a private-network sidecar. It is
 read-only unless `--allow-publisher PUBLIC_KEY` is configured; publication then
 requires a valid signature from an allowed key. There is no requester identity,
 confidential-content authorization, CORS, or payment protocol yet. Everything
@@ -118,7 +120,7 @@ extracted onto the host filesystem.
 
 Limits: 4 MiB per artifact/request, 256 entries per artifact section, 1000 cached
 artifacts, and 256 MiB cached content. Search scans the cache and has no persistent
-index. The sequential loopback server is a development interface, not a hardened
+index. The sequential server is a development interface, not a hardened
 internet service. Linux and macOS are the initial target platforms.
 
 ## Remaining work
