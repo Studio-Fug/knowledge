@@ -22,7 +22,12 @@ use std::{
     about = "Content-addressed designs and traceable verification"
 )]
 struct Cli {
-    #[arg(long, env = "KNOWLEDGE_CACHE", default_value = ".knowledge", global = true)]
+    #[arg(
+        long,
+        env = "KNOWLEDGE_CACHE",
+        default_value = ".knowledge",
+        global = true
+    )]
     cache: PathBuf,
     #[command(subcommand)]
     command: Command,
@@ -131,7 +136,10 @@ fn run(cli: Cli) -> Result<()> {
                 .call()
                 .map_err(|_| Error::new("unhealthy", "cache health endpoint is unavailable"))?;
             if response.status() != 200 {
-                return Err(Error::new("unhealthy", "cache health endpoint did not return 200"));
+                return Err(Error::new(
+                    "unhealthy",
+                    "cache health endpoint did not return 200",
+                ));
             }
             let mut bytes = Vec::new();
             response.into_reader().take(1025).read_to_end(&mut bytes)?;
@@ -240,7 +248,10 @@ fn run(cli: Cli) -> Result<()> {
                     allow_network,
                     allow_publisher,
                 } => {
-                    let allow_publisher: Vec<_> = allow_publisher.into_iter().filter(|p| !p.is_empty()).collect();
+                    let allow_publisher: Vec<_> = allow_publisher
+                        .into_iter()
+                        .filter(|p| !p.is_empty())
+                        .collect();
                     if allow_publisher.iter().any(|p| !canonical::is_hex(p, 32)) {
                         return Err(Error::new("invalid_key", "invalid allowed publisher"));
                     }

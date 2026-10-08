@@ -5,3 +5,6 @@
 !rust-toolchain.toml
 !src/
 !src/**
+**/*.secret
+**/*.authkey
+**/.env*

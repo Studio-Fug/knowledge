@@ -40,9 +40,7 @@ fn route(request: &mut Request, cache: &Cache, publishers: &[String]) -> Result<
     let method = request.method().clone();
     let path = request.url().to_owned();
     match (method, path.as_str()) {
-        (Method::Get, "/health") => {
-            Ok(br#"{"status":"ok","mode":"public_cache"}"#.to_vec())
-        }
+        (Method::Get, "/health") => Ok(br#"{"status":"ok","mode":"public_cache"}"#.to_vec()),
         (Method::Get, path) if path.starts_with("/v1/artifacts/") => {
             canonical::encode(&cache.get(&path[14..])?)
         }

@@ -1,4 +1,6 @@
 /target/
 /.knowledge/
 *.secret
-
+.env
+.env.*
+*.authkey
