@@ -1,0 +1,47 @@
+---
+requirements:
+- id: REQ-108
+  title: Portable containerized CACHE
+  description: The system shall provide a container image running one non-root Rust
+    CACHE process, with runtime configuration for storage, listening and publisher
+    restrictions, and an HTTP health check. The image shall contain no deployment
+    host's paths, network configuration or credentials.
+  refines: [REQ-104]
+  status: approved
+  modules: [Dockerfile, src/main.rs, src/server.rs]
+  method: TM-006
+  tags: [caches, initial, deployment]
+- id: REQ-109
+  title: Optional runtime tailnet access
+  description: An optional launcher shall accept a Tailscale auth key at launch time
+    through an environment variable or file and provide tailnet routing through a
+    separate container. It shall not bake the key into the CACHE image or repository,
+    modify host-specific network policy, enable public Funnel access or bypass
+    artifact-signature and allowed-publisher checks.
+  refines: [REQ-104]
+  status: approved
+  modules: [src/bin/knowledge-launch.rs, deploy/compose.tailnet.yaml, deploy/tailscale/serve.json]
+  method: TM-006
+  tags: [caches, initial, deployment]
+- id: REQ-110
+  title: Container persistence
+  description: Container restart and recreation shall preserve CACHE artifacts and,
+    when tailnet routing is enabled, the node's identity in separate persistent
+    volumes. Ordinary launcher shutdown shall preserve those volumes; each cache
+    volume shall have only one running CACHE writer.
+  refines: [REQ-104]
+  status: approved
+  modules: [compose.yaml, deploy/compose.tailnet.yaml, src/bin/knowledge-launch.rs, src/store.rs]
+  method: TM-006
+  tags: [caches, initial, deployment]
+test_methods:
+- id: TM-006
+  title: Container deployment and persistence scenarios
+  level: simulation
+  procedure: Build and run the cache image natively on amd64 and arm64; check non-root
+    execution, health, publisher restrictions, read-only root filesystem and artifact
+    persistence across recreation. Validate composed tailnet forwarding and absence
+    of public port publishing, privileged routing and baked credentials; test launcher
+    key handling and volume-preserving shutdown. Separately use an operator-provided
+    key and a second allowed tailnet client to validate live routing and node identity
+    across sidecar recreation; configuration inspection alone does not verify this.

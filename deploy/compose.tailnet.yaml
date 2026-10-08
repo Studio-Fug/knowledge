@@ -1,6 +1,6 @@
 services:
   tailscale:
-    image: ${TAILSCALE_IMAGE:-tailscale/tailscale:v1.104.1}
+    image: ${TAILSCALE_IMAGE:-tailscale/tailscale:v1.102.5}
     hostname: ${KNOWLEDGE_HOSTNAME:-knowledge}
     environment:
       TS_AUTHKEY: ${TS_AUTHKEY:-}

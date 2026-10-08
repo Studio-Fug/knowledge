@@ -1,0 +1,58 @@
+# External source requirements. Implementation gaps are explicit in traceability.
+---
+requirements:
+- id: REQ-111
+  title: Git-backed artifact content
+  description: The system shall permit an artifact's concrete design and evidence
+    content to be backed by Git repositories, including GitHub, without requiring
+    CACHEs to retain all realized content bytes. Source descriptors and content
+    commitments shall be constituent data of the artifact, not new first-class objects.
+  refines: [REQ-101]
+  status: approved
+  tags: [artifacts, initial, external-backing]
+  notes:
+  - kind: gap
+    text: External backing is not implemented in the inline-only version-1 model;
+      see docs/traceability.md and the backing-source design decision.
+- id: REQ-112
+  title: Immutable backing descriptors
+  description: Each external source descriptor shall commit to its repository,
+    immutable revision, selected content, realization format and expected SHA-256
+    content commitment within the artifact's content-address coverage. A mutable
+    branch or tag alone shall not identify artifact content. Changing a descriptor
+    or commitment shall create a distinct artifact address.
+  refines: [REQ-101]
+  status: approved
+  method: TM-001
+  tags: [artifacts, initial, external-backing]
+- id: REQ-113
+  title: Validate external realizations
+  description: Before externally backed content is returned as checked or used for
+    verification or a build, the system shall fetch the selected immutable source,
+    realize it using the declared deterministic format and compute its SHA-256
+    commitment. A mismatch shall be rejected. A Git commit identifier or successful
+    download alone shall not establish the Knowledge content commitment.
+  refines: [REQ-102]
+  status: approved
+  method: TM-001
+  tags: [verification, initial, external-backing]
+- id: REQ-114
+  title: Optional realization retention
+  description: A CACHE shall be able to persist artifact manifests and external
+    backing descriptors without retaining their realized design or evidence bytes;
+    retention and eviction of optional realized content shall not change artifact
+    identity or verification meaning.
+  refines: [REQ-104]
+  status: approved
+  tags: [caches, initial, external-backing]
+- id: REQ-115
+  title: External-source checking limits
+  description: When an external source cannot be fetched or its commitment cannot
+    be checked, the system shall expose that checking limitation and shall not
+    represent the missing content as successfully checked. Retrieval failure shall
+    not rewrite the immutable artifact or establish that its underlying claims are
+    false.
+  refines: [REQ-102]
+  status: approved
+  method: TM-002
+  tags: [verification, initial, external-backing]

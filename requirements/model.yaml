@@ -2,8 +2,9 @@
 ---
 project:
   name: knowledge
-  description: Consolidated requirements draft; no implementation or verification
-    evidence exists.
+  description: Requirements for Knowledge; an initial Rust subset and container
+    deployment are implemented. Per-requirement implementation and validation scope
+    are recorded in docs/traceability.md; full product compliance remains unverified.
   phase: Initial single-process CACHE and agent interfaces; human browser next; scale
     and ZKPs later.
 user_needs:
