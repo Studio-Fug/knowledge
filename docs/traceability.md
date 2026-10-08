@@ -22,17 +22,14 @@ cargo test --locked --test container -- --ignored --test-threads=1
 
 ## Git-backed content
 
-| Requirement | Current implementation | Required evidence |
+| Requirement | Implementation | Evidence and limits |
 | --- | --- | --- |
-| REQ-111 | **Gap:** version 1 supports inline design/evidence blobs only. | Git and GitHub realization fixtures integrated with a signed artifact. |
-| REQ-112 | **Gap:** external descriptors and format versions need a model extension. Existing canonicalization/signature tests cover inline fields only. | Pinned-revision validation; changed descriptor/commitment changes identity; mutable-ref rejection. |
-| REQ-113 | **Gap:** no external source fetch/realize/check path yet. Existing substitution verifies complete inline artifact hashes. | Matching and tampered realizations, deterministic tree encoding, bounded fetching and rejection before use. |
-| REQ-114 | **Gap:** local disk cache retains complete inline representations. | Restart with manifest-only storage; fetch and optional eviction preserve identity. |
-| REQ-115 | **Gap:** no external-content checking state yet. | Missing, inaccessible and mismatched sources remain explicit and cannot be treated as checked. |
+| REQ-111 | [version-2 descriptors](../src/model.rs), [source realization](../src/backing.rs), [CLI](../src/main.rs) | `tests/backing.rs::descriptors_are_pinned_hashed_and_fetches_need_explicit_host_permission` integrates external design with a signed artifact. Public HTTPS Git archives, including GitHub; direct Git transport and private credentials remain gaps. |
+| REQ-112 | [descriptor validation and subject hashing](../src/model.rs), [source validation](../src/backing.rs) | Descriptor tests reject mutable revisions and embedded credentials; changed selection changes artifact and subject hashes. Record-source tests check that evidence commitments stay inside the artifact without creating a circular subject. |
+| REQ-113 | [bounded fetching, deterministic realization and hash checking](../src/backing.rs), [realize command](../src/main.rs) | Realization tests cover changed content/modes, reordered archives, transport metadata, unsafe links, duplicate/colliding paths and no partial export. Network smoke test fetches a pinned GitHub source with explicit origin permission. Checked content is exported only after all commitments match; tests are not rerun. |
+| REQ-114 | [manifest storage](../src/store.rs), [separate export](../src/backing.rs) | `tests/backing.rs::cache_persists_only_the_signed_manifest_and_exports_checked_content_separately` stores a small manifest backed by a larger fixture, restarts, realizes separately and removes the realization without changing identity. No automatic realization retention/eviction policy is implemented. |
+| REQ-115 | [checking summaries](../src/model.rs), [fetch failures](../src/backing.rs) | Even trusted, publisher-reported complete external artifacts remain `reusable: false` until the caller realizes their content. Forbidden origins and mismatches fail explicitly without mutating stored manifests. No global availability guarantee or independently-verified status is claimed. |
 
-The proposed identity model keeps the signed artifact manifest's content address,
-with external constituents committed by SHA-256 references checked against their
-realizations. Computing the final address over a fully expanded artifact is an
-alternative still under discussion. The requirements deliberately specify the
-integrity properties without silently choosing between those representations.
-Nix's source-tree/NAR hash is not assumed to equal our canonical artifact hash.
+[Backing-source design](backing.md) specifies the representation and normalization.
+Unit fixtures are synthetic evidence of software behavior. CI results establish
+which tests actually passed; this table alone is not a certification.

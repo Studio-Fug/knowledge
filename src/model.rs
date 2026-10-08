@@ -1,4 +1,8 @@
-use crate::{Error, Result, canonical, backing::{Role, Source}};
+use crate::{
+    Error, Result,
+    backing::{Role, Source},
+    canonical,
+};
 use ed25519_dalek::{Signature, Signer, SigningKey, VerifyingKey};
 use serde::{Deserialize, Serialize};
 use std::{
@@ -245,13 +249,21 @@ impl Payload {
             sources: Vec<&'a Source>,
         }
         Ok(canonical::digest(&canonical::encode(&Subject {
-            context: if self.version == 2 { "knowledge:verification-subject:v2" } else { "knowledge:verification-subject:v1" },
+            context: if self.version == 2 {
+                "knowledge:verification-subject:v2"
+            } else {
+                "knowledge:verification-subject:v1"
+            },
             specification: &self.specification,
             design: &self.design,
             procedure: &self.procedure,
             subject: &self.subject,
             dependencies: &self.dependencies,
-            sources: self.sources.iter().filter(|s| s.role == Role::Design).collect(),
+            sources: self
+                .sources
+                .iter()
+                .filter(|s| s.role == Role::Design)
+                .collect(),
         })?))
     }
 
@@ -271,7 +283,9 @@ impl Payload {
         required(&self.specification.title)?;
         required(&self.subject.identifier)?;
         required(&self.subject.conditions)?;
-        if self.specification.requirements.is_empty() || (self.design.is_empty() && !self.sources.iter().any(|s| s.role == Role::Design)) {
+        if self.specification.requirements.is_empty()
+            || (self.design.is_empty() && !self.sources.iter().any(|s| s.role == Role::Design))
+        {
             return Err(Error::new(
                 "invalid_artifact",
                 "a specification and concrete design are required",
@@ -308,8 +322,17 @@ impl Payload {
         let mut design = blobs(&self.design)?;
         for source in &self.sources {
             source.validate()?;
-            let paths = if source.role == Role::Design { &mut design } else { &mut records };
-            if !paths.insert(source.path.as_str()) { return Err(Error::new("invalid_source", "duplicate source or inline content path")); }
+            let paths = if source.role == Role::Design {
+                &mut design
+            } else {
+                &mut records
+            };
+            if !paths.insert(source.path.as_str()) {
+                return Err(Error::new(
+                    "invalid_source",
+                    "duplicate source or inline content path",
+                ));
+            }
         }
         let steps = identifiers(self.procedure.iter().map(|s| s.id.as_str()))?;
         for step in &self.procedure {
@@ -397,7 +420,11 @@ impl Artifact {
 
     fn message(payload: &Payload) -> Result<Vec<u8>> {
         let hash = canonical::digest(&canonical::encode(payload)?);
-        let mut message = if payload.version == 2 { b"knowledge:public-artifact:v2\0".to_vec() } else { SIGNING_CONTEXT.to_vec() };
+        let mut message = if payload.version == 2 {
+            b"knowledge:public-artifact:v2\0".to_vec()
+        } else {
+            SIGNING_CONTEXT.to_vec()
+        };
         message.extend_from_slice(hash.as_bytes());
         Ok(message)
     }
@@ -505,8 +532,14 @@ impl Artifact {
             address: self.address()?,
             publisher: self.payload.publisher.clone(),
             title: self.payload.specification.title.clone(),
-            reusable: trusted && completeness == Completeness::ReportedComplete && self.payload.sources.is_empty(),
-            backing_check: if self.payload.sources.is_empty() { "inline_content_checked" } else { "external_content_unchecked; realize_before_use" },
+            reusable: trusted
+                && completeness == Completeness::ReportedComplete
+                && self.payload.sources.is_empty(),
+            backing_check: if self.payload.sources.is_empty() {
+                "inline_content_checked"
+            } else {
+                "external_content_unchecked; realize_before_use"
+            },
             completeness,
             missing_requirements: missing,
             claims,

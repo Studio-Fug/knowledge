@@ -21,6 +21,8 @@ jobs:
             base64 < "$path" | tr -d "\n"
             echo
           done
+      - name: Check pinned GitHub realization
+        run: cargo test --locked --test backing -- --ignored --nocapture
       - name: Test
         run: cargo test --locked --all-targets
       - name: Lint

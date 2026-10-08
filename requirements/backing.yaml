@@ -1,4 +1,4 @@
-# External source requirements. Implementation gaps are explicit in traceability.
+# External source requirements. Implementation and limits: docs/traceability.md.
 ---
 requirements:
 - id: REQ-111
@@ -10,10 +10,11 @@ requirements:
   refines: [REQ-101]
   status: approved
   tags: [artifacts, initial, external-backing]
+  modules: [src/backing.rs, src/model.rs, src/main.rs]
   notes:
   - kind: gap
-    text: External backing is not implemented in the inline-only version-1 model;
-      see docs/traceability.md and the backing-source design decision.
+    text: Initial support uses public HTTPS Git source archives. Direct Git transport,
+      private-source credentials, submodules and Git LFS materialization remain unsupported.
 - id: REQ-112
   title: Immutable backing descriptors
   description: Each external source descriptor shall commit to its repository,
@@ -23,6 +24,7 @@ requirements:
     or commitment shall create a distinct artifact address.
   refines: [REQ-101]
   status: approved
+  modules: [src/backing.rs, src/model.rs]
   method: TM-001
   tags: [artifacts, initial, external-backing]
 - id: REQ-113
@@ -34,6 +36,7 @@ requirements:
     download alone shall not establish the Knowledge content commitment.
   refines: [REQ-102]
   status: approved
+  modules: [src/backing.rs, src/main.rs]
   method: TM-001
   tags: [verification, initial, external-backing]
 - id: REQ-114
@@ -44,6 +47,7 @@ requirements:
     identity or verification meaning.
   refines: [REQ-104]
   status: approved
+  modules: [src/store.rs, src/main.rs]
   tags: [caches, initial, external-backing]
 - id: REQ-115
   title: External-source checking limits
@@ -54,5 +58,6 @@ requirements:
     false.
   refines: [REQ-102]
   status: approved
+  modules: [src/model.rs, src/backing.rs, src/main.rs]
   method: TM-002
   tags: [verification, initial, external-backing]

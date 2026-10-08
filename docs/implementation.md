@@ -35,6 +35,9 @@ empty collections are `[]`. Blob contents are lowercase hex bytes. `seal` sets
 the publisher key but never rewrites evidence. First compute the subject hash,
 then put it into each applicable evidence record, then sign the payload.
 
+[Git-backed content](backing.md) extends the payload with optional `sources` in
+version 2. Existing version-1 artifact addresses and signatures remain valid.
+
 ## Agent API
 
 The server defaults to `127.0.0.1:8787`; a non-loopback listener requires explicit
@@ -73,7 +76,7 @@ host or execute a build.
 
 ## Identity and verification
 
-Version 1 canonical JSON sorts object keys, preserves array order and Unicode
+Versions 1 and 2 use canonical JSON that sorts object keys, preserves array order and Unicode
 code points, emits compact UTF-8, and permits only integer numbers. Duplicate
 keys and unknown fields are rejected. There is no implicit Unicode normalization.
 The SHA-256 address covers the entire signed artifact, including descriptions,
@@ -95,7 +98,9 @@ show `inferred`, `publisher_reported_support`, or `failed`.
 Signatures authenticate the publisher, **not physical truth or adequacy of the
 tests**. Reports and reporter independence are publisher assertions. `reusable`
 is false unless the requester explicitly supplies the exact trusted publisher
-key and the artifact is reported complete. Even then, the output explicitly says
+key, the artifact is reported complete, and its content is inline. External content
+always remains unchecked in a search/inspect summary; [realize](backing.md) checks
+its commitments before exporting it. Even then, the output explicitly says
 tests were not rerun. This prototype has no independently-checked status.
 
 Search is a deterministic scan using labels, aliases, token stemming, and one
@@ -115,8 +120,8 @@ the absence of contrary evidence elsewhere.
 One process owns the cache through an exclusive file lock. Writes use atomic
 non-overwriting temporary-file installation and filesystem synchronization.
 Reads revalidate signatures and content addresses; corruption fails closed.
-Artifact paths are derived only from validated hashes. No design is executed or
-extracted onto the host filesystem.
+Artifact paths are derived only from validated hashes. No design is executed. Explicit realization exports checked files to a new
+directory; ordinary cache reads do not fetch or extract external sources.
 
 Limits: 4 MiB per artifact/request, 256 entries per artifact section, 1000 cached
 artifacts, and 256 MiB cached content. Search scans the cache and has no persistent
