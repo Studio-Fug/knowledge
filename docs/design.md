@@ -162,3 +162,25 @@ signatures authenticate origin and integrity; neither alone establishes physical
 truth: [ZKP overview](https://ethereum.org/zero-knowledge-proofs),
 [NIST signature definition](https://csrc.nist.gov/glossary/term/digital_signature).
 Specific confidential commitments and future proof guarantees remain design work.
+
+## External source backing decision
+
+REQ-111–115 extend an artifact with committed Git source descriptors. We keep
+the SHA-256 address over the signed manifest and commit to realized source trees
+within it. This preserves exact-hash retrieval without forcing every cache to
+store every constituent byte. A new descriptor, selection, hash or format is a
+new artifact; temporary realization and eviction are storage choices.
+
+The first transport is a pinned public HTTPS Git archive, including GitHub, with
+a small deterministic file-tree encoding rather than Git's object hash or Nix's
+NAR encoding. Source identity includes paths, executable bits and bytes; transport
+metadata is excluded. All checks happen before export. Search can describe the
+manifest's reports but keeps external content explicitly unchecked. A successful
+realization establishes content consistency, not independently reproduced tests.
+
+This is version 2; version 1 remains readable without changing its addresses.
+Design source commitments enter the verification subject. Report source
+commitments enter the enclosing artifact hash, avoiding circular report binding.
+The [backing design](backing.md) and [traceability](traceability.md) define initial
+limitations and software evidence. Direct Git transport and private-source
+authorization can be added later without silently redefining this format.

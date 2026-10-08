@@ -3,8 +3,10 @@
 This is a first pass for the proposed system, not a security certification.
 The machine-readable hazards, harms, controls, and verification procedures are
 in [risks.yaml](../requirements/risks.yaml). All risks and controls are proposed.
-No mitigation is implemented or verified, no residual risk is accepted, and no
-numerical loss or likelihood claim is supported by operational data.
+The Rust prototype implements some integrity and resource controls, with specific
+checks in [traceability.md](traceability.md). These do not establish full mitigation:
+no residual risk is accepted, and no numerical loss or likelihood claim is
+supported by operational data.
 
 ## Scope and trust boundaries
 
@@ -157,3 +159,19 @@ The attack surface also draws on primary OWASP guidance:
 and [server-side request forgery](https://top10.owasp.org/2021/A10_2021-Server-Side_Request_Forgery_%28SSRF%29/).
 These motivate data/instruction separation, bounded work, and destination controls.
 Their applicability and sufficiency still require testing in this implementation.
+
+## External source backing
+
+A signed source descriptor is untrusted input. REQ-112/113 commit to an immutable
+selection and check realized SHA-256 bytes; REQ-115 keeps unmaterialized content
+explicitly unchecked. This contributes to substitution controls (RISK-004), but
+does not establish Git provenance or report truth (RISK-001). A malicious publisher
+can commit to fabricated evidence just as easily as honest evidence.
+
+The resolver reads bounded archives without execution, rejects links, traversal
+and path collisions, and publishes output only after successful checks. These
+contribute to RISK-009/010 controls. Explicit HTTPS origin permission and disabled
+redirects limit network contact; allowlisted destinations must be trusted, and
+comprehensive DNS/IP isolation is not implemented. Availability remains dependent
+on external hosts (RISK-011). Commit IDs and successful downloads never substitute
+for realization hashes. See [backing.md](backing.md) for precise limits.
