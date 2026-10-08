@@ -229,7 +229,11 @@ mod tests {
         ]);
         let command = compose_command(cli).unwrap();
         assert!(command.get_args().any(|arg| arg == "down"));
-        assert!(!command.get_args().any(|arg| arg == "--volumes" || arg == "-v"));
+        assert!(
+            !command
+                .get_args()
+                .any(|arg| arg == "--volumes" || arg == "-v")
+        );
         assert!(command.get_envs().any(|(name, value)| {
             name == "TS_AUTHKEY" && value == Some(std::ffi::OsStr::new(""))
         }));

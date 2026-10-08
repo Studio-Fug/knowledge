@@ -209,6 +209,22 @@ fn compose_keeps_tailnet_routing_outside_the_cache_image() {
     assert!(cache.get("ports").is_none());
     assert_eq!(cache["command"][2], "127.0.0.1:8787");
     let sidecar = &config["services"]["tailscale"];
+    success(&[
+        "run",
+        "--rm",
+        "--entrypoint",
+        "tailscale",
+        sidecar["image"].as_str().unwrap(),
+        "version",
+    ]);
+    success(&[
+        "run",
+        "--rm",
+        "--entrypoint",
+        "wget",
+        sidecar["image"].as_str().unwrap(),
+        "--help",
+    ]);
     assert_eq!(sidecar["environment"]["TS_USERSPACE"], "true");
     assert_eq!(sidecar["environment"]["TS_AUTH_ONCE"], "true");
     assert!(sidecar.get("cap_add").is_none());
