@@ -144,3 +144,49 @@ fn pinned_github_archive_is_realized_and_checked() {
     let descriptor = Source {path:"example".into(),role:Role::Design,repository:"https://github.com/Studio-Fug/knowledge".into(),revision:revision.into(),archive:url,subdirectory:"examples".into(),format:Format::GitTarGzipV1,sha256:realization.sha256};
     descriptor.fetch(&["https://codeload.github.com".into()]).unwrap();
 }
+
+#[test]
+fn legacy_inline_subject_and_signed_serialization_remain_compatible() {
+    use ed25519_dalek::Signer;
+    let payload: Payload = canonical::parse(include_bytes!("../examples/payload.json")).unwrap();
+    assert_eq!(payload.subject_hash().unwrap(), "4585949161f77c795e60ea48b27eec46dd3e746e28debf6d328d9bf75364ce22");
+    let key = SigningKey::from_bytes(&[7;32]);
+    let artifact = Artifact::seal(payload, &key).unwrap();
+    let mut legacy: serde_json::Value = serde_json::from_slice(include_bytes!("../examples/payload.json")).unwrap();
+    legacy["publisher"] = artifact.payload.publisher.clone().into();
+    assert!(legacy.get("sources").is_none());
+    assert_eq!(canonical::encode(&legacy).unwrap(), canonical::encode(&artifact.payload).unwrap());
+    let mut message = b"knowledge:public-artifact:v1\0".to_vec();
+    message.extend_from_slice(canonical::digest(&canonical::encode(&legacy).unwrap()).as_bytes());
+    assert_eq!(artifact.signature,hex::encode(key.sign(&message).to_bytes()));
+    let mut incompatible = artifact.payload;
+    incompatible.sources.push(source("a".repeat(64)));
+    assert_eq!(incompatible.validate().unwrap_err().code,"unsupported_version");
+}
+
+#[test]
+fn cli_checks_hashes_and_refuses_unapproved_sources_without_partial_export() {
+    use std::process::Command;
+    let directory = tempfile::tempdir().unwrap();
+    let archive_bytes = archive(&[("repo/src/main.rs",b"fn main() {}",0o644)],1);
+    let input = directory.path().join("source.tar.gz");
+    std::fs::write(&input,&archive_bytes).unwrap();
+    let result = Command::new(env!("CARGO_BIN_EXE_knowledge")).args(["source-hash","--input",input.to_str().unwrap(),"--subdirectory","src"]).output().unwrap();
+    assert!(result.status.success());
+    let hash:serde_json::Value = serde_json::from_slice(&result.stdout).unwrap();
+    let mut payload:Payload = canonical::parse(include_bytes!("../examples/payload.json")).unwrap();
+    payload.version=2;
+    payload.sources.push(source(hash["sha256"].as_str().unwrap().into()));
+    let artifact=Artifact::seal(payload,&SigningKey::from_bytes(&[7;32])).unwrap();
+    let cache_path=directory.path().join("cache");
+    let cache=Cache::open(&cache_path).unwrap();
+    let address=cache.put(&artifact).unwrap();
+    drop(cache);
+    let output=directory.path().join("output");
+    let result=Command::new(env!("CARGO_BIN_EXE_knowledge")).args(["--cache",cache_path.to_str().unwrap(),"realize",&address,"--output",output.to_str().unwrap()]).output().unwrap();
+    assert!(!result.status.success());
+    let error:serde_json::Value=serde_json::from_slice(&result.stderr).unwrap();
+    assert_eq!(error["code"],"source_forbidden");
+    assert!(!output.exists());
+    assert_eq!(Cache::open(&cache_path).unwrap().get(&address).unwrap().address().unwrap(),address);
+}
