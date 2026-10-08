@@ -48,6 +48,7 @@ fn fixture() -> Artifact {
         }],
         predecessors: vec![],
         dependencies: vec![],
+        sources: vec![],
     };
     payload.evidence.push(Evidence {
         id: "REPORT".into(),

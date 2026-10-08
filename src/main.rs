@@ -1,7 +1,7 @@
 use clap::{Parser, Subcommand};
 use ed25519_dalek::SigningKey;
 use knowledge::{
-    Error, Result, canonical,
+    Error, Result, canonical, backing,
     model::{Artifact, Payload, Rigor, ScopeKind},
     query::{self, Query},
     server,
@@ -35,6 +35,18 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Command {
+    /// Compute a deterministic source-tree SHA-256 from a Git tar.gz archive.
+    SourceHash {
+        #[arg(long)] input: PathBuf,
+        #[arg(long, default_value = "")] subdirectory: String,
+    },
+    /// Fetch, verify and export all content for an exact artifact into a new directory.
+    Realize {
+        address: String,
+        #[arg(long)] output: PathBuf,
+        #[arg(long)] allow_origin: Vec<String>,
+        #[arg(long)] substituter: Vec<String>,
+    },
     /// Check an HTTP cache without opening or locking local storage.
     Healthcheck {
         #[arg(long, default_value = "http://127.0.0.1:8787/health")]
@@ -127,6 +139,12 @@ fn print(value: &impl Serialize) -> Result<()> {
 
 fn run(cli: Cli) -> Result<()> {
     match cli.command {
+        Command::SourceHash { input, subdirectory } => {
+            let mut bytes = Vec::new();
+            File::open(input)?.take(32 * 1024 * 1024 + 1).read_to_end(&mut bytes)?;
+            let tree = backing::realize(&bytes, &subdirectory)?;
+            print(&serde_json::json!({"sha256":tree.sha256,"files":tree.files.len(),"format":"git_tar_gzip_v1"}))
+        }
         Command::Healthcheck { url } => {
             let response = ureq::AgentBuilder::new()
                 .timeout(std::time::Duration::from_secs(2))
@@ -208,6 +226,27 @@ fn run(cli: Cli) -> Result<()> {
         command => {
             let cache = Cache::open(cli.cache)?;
             match command {
+                Command::Realize { address, output, allow_origin, substituter } => {
+                    let artifact = cache.fetch(&address, &substituter)?;
+                    let mut trees = Vec::new();
+                    let mut total = 0usize;
+                    for (prefix, blobs) in [("design", &artifact.payload.design), ("records", &artifact.payload.records)] {
+                        for blob in blobs {
+                            let bytes = hex::decode(&blob.data).map_err(|_| Error::new("invalid_artifact", "invalid blob bytes"))?;
+                            total += bytes.len();
+                            trees.push((prefix.to_owned(), backing::Realization { sha256: canonical::digest(&bytes), files: vec![backing::RealizedFile { path: blob.path.clone(), executable: false, bytes }] }));
+                        }
+                    }
+                    for source in &artifact.payload.sources {
+                        let tree = source.fetch(&allow_origin)?;
+                        total += tree.files.iter().map(|f| f.bytes.len()).sum::<usize>();
+                        if total > 64 * 1024 * 1024 { return Err(Error::new("too_large", "combined realization exceeds 64 MiB")); }
+                        let role = if source.role == backing::Role::Design { "design" } else { "records" };
+                        trees.push((format!("{role}/{}", source.path), tree));
+                    }
+                    backing::export(&trees, &output)?;
+                    print(&serde_json::json!({"address":address,"output":output,"source_commitments_checked":artifact.payload.sources.len(),"bytes":total,"checking":"content_and_signatures_checked; tests_not_rerun"}))
+                }
                 Command::Put { input } => {
                     let artifact = canonical::parse(&read(&input)?)?;
                     print(&serde_json::json!({"address":cache.put(&artifact)?}))

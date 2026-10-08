@@ -1,4 +1,4 @@
-use crate::{Error, Result, canonical};
+use crate::{Error, Result, canonical, backing::{Role, Source}};
 use ed25519_dalek::{Signature, Signer, SigningKey, VerifyingKey};
 use serde::{Deserialize, Serialize};
 use std::{
@@ -29,6 +29,8 @@ pub struct Payload {
     pub claims: Vec<Claim>,
     pub predecessors: Vec<Predecessor>,
     pub dependencies: Vec<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub sources: Vec<Source>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -171,6 +173,7 @@ pub struct Summary {
     pub signature_valid: bool,
     pub checking: &'static str,
     pub reusable: bool,
+    pub backing_check: &'static str,
     pub source: String,
 }
 
@@ -238,22 +241,25 @@ impl Payload {
             procedure: &'a [Step],
             subject: &'a PhysicalScope,
             dependencies: &'a [String],
+            #[serde(skip_serializing_if = "Vec::is_empty")]
+            sources: Vec<&'a Source>,
         }
         Ok(canonical::digest(&canonical::encode(&Subject {
-            context: "knowledge:verification-subject:v1",
+            context: if self.version == 2 { "knowledge:verification-subject:v2" } else { "knowledge:verification-subject:v1" },
             specification: &self.specification,
             design: &self.design,
             procedure: &self.procedure,
             subject: &self.subject,
             dependencies: &self.dependencies,
+            sources: self.sources.iter().filter(|s| s.role == Role::Design).collect(),
         })?))
     }
 
     pub fn validate(&self) -> Result<()> {
-        if self.version != 1 {
+        if ![1, 2].contains(&self.version) || (self.version == 1 && !self.sources.is_empty()) {
             return Err(Error::new(
                 "unsupported_version",
-                "only public artifact version 1 is supported",
+                "public versions 1 and 2 are supported; external sources require version 2",
             ));
         }
         if !canonical::is_hex(&self.publisher, 32) {
@@ -265,7 +271,7 @@ impl Payload {
         required(&self.specification.title)?;
         required(&self.subject.identifier)?;
         required(&self.subject.conditions)?;
-        if self.specification.requirements.is_empty() || self.design.is_empty() {
+        if self.specification.requirements.is_empty() || (self.design.is_empty() && !self.sources.iter().any(|s| s.role == Role::Design)) {
             return Err(Error::new(
                 "invalid_artifact",
                 "a specification and concrete design are required",
@@ -280,6 +286,7 @@ impl Payload {
             self.claims.len(),
             self.predecessors.len(),
             self.dependencies.len(),
+            self.sources.len(),
         ] {
             if count > 256 {
                 return Err(Error::new(
@@ -297,8 +304,13 @@ impl Payload {
         for r in &self.specification.requirements {
             required(&r.text)?;
         }
-        blobs(&self.design)?;
-        let records = blobs(&self.records)?;
+        let mut records = blobs(&self.records)?;
+        let mut design = blobs(&self.design)?;
+        for source in &self.sources {
+            source.validate()?;
+            let paths = if source.role == Role::Design { &mut design } else { &mut records };
+            if !paths.insert(source.path.as_str()) { return Err(Error::new("invalid_source", "duplicate source or inline content path")); }
+        }
         let steps = identifiers(self.procedure.iter().map(|s| s.id.as_str()))?;
         for step in &self.procedure {
             required(&step.instructions)?;
@@ -385,7 +397,7 @@ impl Artifact {
 
     fn message(payload: &Payload) -> Result<Vec<u8>> {
         let hash = canonical::digest(&canonical::encode(payload)?);
-        let mut message = SIGNING_CONTEXT.to_vec();
+        let mut message = if payload.version == 2 { b"knowledge:public-artifact:v2\0".to_vec() } else { SIGNING_CONTEXT.to_vec() };
         message.extend_from_slice(hash.as_bytes());
         Ok(message)
     }
@@ -493,7 +505,8 @@ impl Artifact {
             address: self.address()?,
             publisher: self.payload.publisher.clone(),
             title: self.payload.specification.title.clone(),
-            reusable: trusted && completeness == Completeness::ReportedComplete,
+            reusable: trusted && completeness == Completeness::ReportedComplete && self.payload.sources.is_empty(),
+            backing_check: if self.payload.sources.is_empty() { "inline_content_checked" } else { "external_content_unchecked; realize_before_use" },
             completeness,
             missing_requirements: missing,
             claims,
