@@ -12,6 +12,33 @@ pub struct Cache {
     _lock: File,
 }
 
+impl Drop for Cache {
+    fn drop(&mut self) {
+        // A forked child may briefly retain this open-file description before
+        // exec. Closing our descriptor alone would leave its lock held.
+        let _ = FileExt::unlock(&self._lock);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Cache;
+
+    #[test]
+    fn owner_drop_releases_lock_even_with_an_inherited_descriptor() {
+        let root = tempfile::tempdir().unwrap();
+        let owner = Cache::open(root.path()).unwrap();
+        let inherited = owner._lock.try_clone().unwrap();
+        drop(owner);
+        let replacement = Cache::open(root.path()).unwrap();
+        assert!(Cache::open(root.path()).is_err());
+        drop(inherited);
+        assert!(Cache::open(root.path()).is_err());
+        drop(replacement);
+        assert!(Cache::open(root.path()).is_ok());
+    }
+}
+
 fn regular(path: &Path) -> Result<()> {
     if fs::symlink_metadata(path)?.file_type().is_symlink() {
         return Err(Error::new(
