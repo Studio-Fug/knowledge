@@ -58,10 +58,11 @@ fn supported_and_rigor_queries_match_the_qualifying_claim_not_an_unverified_neig
  p.claims=vec![Claim {kind:ClaimKind::Capability,text:"bucket".into(),aliases:vec![],evidence:vec![]},Claim {kind:ClaimKind::Capability,text:"emits light".into(),aliases:vec![],evidence:vec!["REPORT".into()]}];
  p.evidence.push(Evidence {id:"REPORT".into(),subject_hash:p.subject_hash().unwrap(),requirements:vec!["WATER".into()],step:"TEST".into(),records:vec!["report.txt".into()],outcome:Outcome::Pass,rigor:Rigor::Physical,reporter:p.publisher.clone(),origin:EvidenceOrigin::Publisher,reproduction_notes:String::new()});
  cache.put(&Artifact::seal(p,&SigningKey::from_bytes(&[7;32])).unwrap()).unwrap();
+ let q=Query {threshold:Some(0.1),..query()};
  let mut index=Index::open(&cache,provider(Arc::new(AtomicUsize::new(0)),"a",false)).unwrap();index.backfill(&cache).unwrap();
- assert_eq!(index.search(&cache,&query()).unwrap().matches.len(),1);
- assert!(index.search(&cache,&Query {supported_claims_only:true,..query()}).unwrap().matches.is_empty());
- assert!(index.search(&cache,&Query {rigor:Some(Rigor::Physical),..query()}).unwrap().matches.is_empty());
+ assert_eq!(index.search(&cache,&q).unwrap().matches.len(),1);
+ assert!(index.search(&cache,&Query {supported_claims_only:true,..q.clone()}).unwrap().matches.is_empty());
+ assert!(index.search(&cache,&Query {rigor:Some(Rigor::Physical),..q}).unwrap().matches.is_empty());
 }
 
 #[test]
