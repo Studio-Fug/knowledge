@@ -150,6 +150,8 @@ pub struct IndexStatus {
 #[derive(Serialize)]
 pub struct SearchEvidence {
     pub query: String,
+    pub filters: serde_json::Value,
+    pub scope_artifacts: Vec<String>,
     pub threshold_bits: u64,
     pub query_embedding: Receipt,
     pub object_embeddings: BTreeMap<String,Receipt>,
@@ -267,7 +269,9 @@ impl Index {
         let matches=query::select(eligible,query);
         qualifying.retain(|address,_| matches.iter().any(|summary| &summary.address==address));
         let records=matches.iter().map(|s|(s.address.clone(),self.records[&s.address].clone())).collect();
-        Ok(Search {matches,scanned,scope:"local_cache; semantic_similarity; publisher_assertions; eligible_revisions_only",semantic:Some(SearchEvidence {query:query.text.clone(),threshold_bits:threshold.to_bits(),query_embedding:embedding,object_embeddings:records,skipped,qualifying_claim_embeddings:qualifying,scoring:"inclusive cosine threshold; qualifying claim vectors for rigor/support filters, whole-object vector otherwise; descending similarity; address tie-break"})})
+        let mut filters=serde_json::to_value(query)?;
+        filters.as_object_mut().ok_or_else(|| Error::new("invalid_query","query is not an object"))?.remove("threshold");
+        Ok(Search {matches,scanned,scope:"local_cache; semantic_similarity; publisher_assertions; eligible_revisions_only",semantic:Some(SearchEvidence {query:query.text.clone(),filters,scope_artifacts:cache.addresses()?,threshold_bits:threshold.to_bits(),query_embedding:embedding,object_embeddings:records,skipped,qualifying_claim_embeddings:qualifying,scoring:"inclusive cosine threshold; qualifying claim vectors for rigor/support filters, whole-object vector otherwise; descending similarity; address tie-break"})})
     }
 }
 

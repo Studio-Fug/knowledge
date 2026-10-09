@@ -12,7 +12,7 @@ impl Embedder for Mock {
 fn provider(calls:Arc<AtomicUsize>,revision:&str,bad:bool)->Box<dyn Embedder> {Box::new(Mock {recipe:Recipe::new("mock://local".into(),"test".into(),revision.into()),calls,bad})}
 fn artifact(title:&str)->Artifact {
  let mut p:Payload=canonical::parse(include_bytes!("../examples/payload.json")).unwrap();
- p.specification.title=title.into();p.claims.clear();p.subject.identifier="test-subject".into();
+ p.specification.title=title.into();p.claims.clear();p.subject.identifier="test-subject".into();p.specification.requirements[0].text="Carry liquids".into();
  Artifact::seal(p,&SigningKey::from_bytes(&[7;32])).unwrap()
 }
 fn query()->Query {Query {text:"moving water".into(),mode:Some(Mode::Semantic),threshold:Some(0.9),include_incomplete:true,..Query::default()}}
@@ -46,4 +46,55 @@ fn api_decimals_do_not_change_artifact_canonicalization_or_allow_duplicate_keys(
  let query:Query=canonical::parse_request(br#"{"threshold":0.7}"#).unwrap();assert_eq!(query.threshold,Some(0.7));
  assert!(canonical::parse::<serde_json::Value>(br#"{"threshold":0.7}"#).is_err());
  assert!(canonical::parse_request::<Query>(br#"{"threshold":0.7,"threshold":0.8}"#).is_err());
+}
+
+#[test]
+fn supported_and_rigor_queries_match_the_qualifying_claim_not_an_unverified_neighbor() {
+ use knowledge::model::{Claim,ClaimKind,Evidence,EvidenceOrigin,Outcome,Rigor,Step,Blob};
+ let root=tempfile::tempdir().unwrap();let cache=Cache::open(root.path()).unwrap();
+ let mut p=artifact("lamp").payload;
+ p.procedure.push(Step {id:"TEST".into(),instructions:"Synthetic fixture".into(),acceptance:"Light emitted".into()});
+ p.records.push(Blob {path:"report.txt".into(),data:hex::encode("synthetic passing report")});
+ p.claims=vec![Claim {kind:ClaimKind::Capability,text:"bucket".into(),aliases:vec![],evidence:vec![]},Claim {kind:ClaimKind::Capability,text:"emits light".into(),aliases:vec![],evidence:vec!["REPORT".into()]}];
+ p.evidence.push(Evidence {id:"REPORT".into(),subject_hash:p.subject_hash().unwrap(),requirements:vec!["WATER".into()],step:"TEST".into(),records:vec!["report.txt".into()],outcome:Outcome::Pass,rigor:Rigor::Physical,reporter:p.publisher.clone(),origin:EvidenceOrigin::Publisher,reproduction_notes:String::new()});
+ cache.put(&Artifact::seal(p,&SigningKey::from_bytes(&[7;32])).unwrap()).unwrap();
+ let mut index=Index::open(&cache,provider(Arc::new(AtomicUsize::new(0)),"a",false)).unwrap();index.backfill(&cache).unwrap();
+ assert_eq!(index.search(&cache,&query()).unwrap().matches.len(),1);
+ assert!(index.search(&cache,&Query {supported_claims_only:true,..query()}).unwrap().matches.is_empty());
+ assert!(index.search(&cache,&Query {rigor:Some(Rigor::Physical),..query()}).unwrap().matches.is_empty());
+}
+
+#[test]
+fn every_signed_field_reaches_the_model_without_utf8_truncation() {
+ use std::sync::Mutex;
+ struct Capture {recipe:Recipe,inputs:Arc<Mutex<Vec<String>>>}
+ impl Embedder for Capture {
+  fn recipe(&self)->&Recipe {&self.recipe}
+  fn embed(&self,input:&[String])->Result<Vec<Vec<f32>>> {self.inputs.lock().unwrap().extend_from_slice(input);Ok(input.iter().map(|_|vec![1.0,0.0]).collect())}
+ }
+ let root=tempfile::tempdir().unwrap();let cache=Cache::open(root.path()).unwrap();
+ let object=artifact(&"桶".repeat(2000));cache.put(&object).unwrap();
+ let inputs=Arc::new(Mutex::new(Vec::new()));
+ let mut index=Index::open(&cache,Box::new(Capture {recipe:Recipe::new("mock://local".into(),"capture".into(),"a".into()),inputs:inputs.clone()})).unwrap();index.backfill(&cache).unwrap();
+ let captured=inputs.lock().unwrap();assert!(captured.len()>1);assert!(captured.iter().all(|chunk|chunk.len()<=2048));
+ assert_eq!(captured.concat().as_bytes(),canonical::encode(&object).unwrap());
+}
+
+#[test]
+#[ignore="requires a real Ollama embedding model"]
+fn real_model_discovers_a_container_for_carrying_water_without_lexical_overlap() {
+ let endpoint=std::env::var("KNOWLEDGE_EMBEDDING_ENDPOINT").unwrap();
+ let model=std::env::var("KNOWLEDGE_EMBEDDING_MODEL").unwrap();
+ let root=tempfile::tempdir().unwrap();let cache=Cache::open(root.path()).unwrap();
+ let mut bucket=artifact("Bucket with a handle").payload;
+ bucket.specification.requirements[0].text="A portable open vessel for carrying liquids".into();bucket.design[0].data=hex::encode("A cylindrical vessel with a curved handle");bucket.subject.conditions="Manual transport".into();
+ let bucket=Artifact::seal(bucket,&SigningKey::from_bytes(&[7;32])).unwrap();let address=cache.put(&bucket).unwrap();
+ let mut lamp=artifact("Electric lamp").payload;lamp.specification.requirements[0].text="Illuminate a room with electric light".into();lamp.design[0].data=hex::encode("Light bulb with an electric circuit");lamp.subject.conditions="Indoor illumination".into();cache.put(&Artifact::seal(lamp,&SigningKey::from_bytes(&[7;32])).unwrap()).unwrap();
+ let mut index=Index::open(&cache,Box::new(embedding::Ollama::connect(&endpoint,&model).unwrap())).unwrap();index.backfill(&cache).unwrap();assert_eq!(index.status(2).indexed,2,"{:?}",index.status(2).failures);
+ let q=Query {text:"moving water".into(),threshold:Some(-1.0),..query()};
+ assert!(knowledge::query::search(&cache,&q).unwrap().matches.is_empty());
+ let result=index.search(&cache,&q).unwrap();assert_eq!(result.matches.len(),2);assert_eq!(result.matches[0].address,address);
+ let high=result.matches[0].similarity.unwrap();let low=result.matches[1].similarity.unwrap();assert!(high>low);
+ let selected=index.search(&cache,&Query {threshold:Some((high+low)/2.0),..q}).unwrap();assert_eq!(selected.matches.len(),1);assert_eq!(selected.matches[0].address,address);
+ println!("REAL_EMBEDDING_MODEL:{}",model);println!("BUCKET_SIMILARITY:{high}; LAMP_SIMILARITY:{low}");
 }

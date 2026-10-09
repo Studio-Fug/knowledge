@@ -26,9 +26,33 @@ jobs:
         run: cargo test --locked --all-targets
       - name: Lint
         run: cargo clippy --locked --all-targets -- -D warnings
+  embeddings:
+    needs: check
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Install Rust
+        run: rustup toolchain install 1.99.0 --profile minimal
+      - name: Start actual embedding model
+        run: |
+          docker run -d --name embedding-model -p 127.0.0.1:11434:11434 ollama/ollama:0.40.1
+          for attempt in $(seq 1 60); do
+            if docker exec embedding-model ollama list; then break; fi
+            sleep 1
+          done
+          docker exec embedding-model ollama pull embeddinggemma
+      - name: Test real semantic retrieval
+        env:
+          KNOWLEDGE_EMBEDDING_ENDPOINT: http://127.0.0.1:11434
+          KNOWLEDGE_EMBEDDING_MODEL: embeddinggemma
+        run: cargo test --locked --test embedding -- --ignored --nocapture
+      - name: Model logs
+        if: always()
+        run: docker logs embedding-model
   image:
     if: github.ref == 'refs/heads/main'
-    needs: check
+    needs: [check, embeddings]
     strategy:
       fail-fast: false
       matrix:
