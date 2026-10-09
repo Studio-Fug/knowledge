@@ -15,6 +15,7 @@ use std::{
 };
 
 const CHUNK_BYTES: usize = 1024;
+const MAX_CHUNKS: usize = canonical::MAX_BYTES / (CHUNK_BYTES - 3) + 1;
 const MAX_DIMENSIONS: usize = 4096;
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -205,7 +206,7 @@ impl Receipt {
         if canonical::digest(&canonical::encode(&self.record)?) != self.sha256
             || !canonical::is_hex(&self.record.input_sha256, 32)
             || self.record.chunks == 0
-            || self.record.chunks > 4096
+            || self.record.chunks > MAX_CHUNKS
         {
             return Err(Error::new(
                 "invalid_embedding",
