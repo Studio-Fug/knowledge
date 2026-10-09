@@ -28,8 +28,9 @@ requirements:
 - id: REQ-118
   title: Committed embedding derivation and query provenance
   description: Derived embedding records shall commit to the exact input, model
-    identity and revision, preprocessing recipe and vector bytes. Results shall
-    expose committed query and object derivations, threshold, filters and known
+    identity and revision, preprocessing recipe and vector bytes. On explicit
+    request, results shall expose committed query and object derivations, threshold,
+    filters and known
     local search scope. Changing model or recipe shall not reuse an incompatible
     index. Embeddings are derived search data, not verification evidence, semantic
     decomposition revisions or a new first-class database object type; changing
@@ -64,4 +65,5 @@ test_methods:
     moving-water query without lexical overlap and reject a less similar lamp by
     a threshold between their scores. Synthetic vectors alone do not establish
     semantic quality. Test a real multi-chunk catalog artifact and configured HTTP
-    ingestion/search. Model quality remains empirical and domain-dependent.
+    ingestion/search, compact default responses and explicit provenance opt-in.
+    Model quality remains empirical and domain-dependent.
