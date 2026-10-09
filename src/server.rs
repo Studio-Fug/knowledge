@@ -1,7 +1,7 @@
 use crate::{
     Error, Result, canonical,
-    model::Artifact,
     embedding::{self, Index},
+    model::Artifact,
     query::Query,
     store::Cache,
 };
@@ -37,12 +37,28 @@ fn body(request: &mut Request) -> Result<Vec<u8>> {
     Ok(bytes)
 }
 
-fn route(request: &mut Request, cache: &Cache, publishers: &[String], mut index: Option<&mut Index>) -> Result<Vec<u8>> {
+fn route(
+    request: &mut Request,
+    cache: &Cache,
+    publishers: &[String],
+    mut index: Option<&mut Index>,
+) -> Result<Vec<u8>> {
     let method = request.method().clone();
     let path = request.url().to_owned();
     match (method, path.as_str()) {
         (Method::Get, "/health") => Ok(br#"{"status":"ok","mode":"public_cache"}"#.to_vec()),
-        (Method::Get, "/v1/embeddings/status") => canonical::encode(&index.as_ref().map(|i| i.status(cache.addresses().map_or(0, |a| a.len()))).unwrap_or(embedding::IndexStatus {enabled:false,indexed:0,total:cache.addresses()?.len(),failures:Default::default(),recipe:None})),
+        (Method::Get, "/v1/embeddings/status") => canonical::encode(
+            &index
+                .as_ref()
+                .map(|i| i.status(cache.addresses().map_or(0, |a| a.len())))
+                .unwrap_or(embedding::IndexStatus {
+                    enabled: false,
+                    indexed: 0,
+                    total: cache.addresses()?.len(),
+                    failures: Default::default(),
+                    recipe: None,
+                }),
+        ),
         (Method::Get, path) if path.starts_with("/v1/artifacts/") => {
             canonical::encode(&cache.get(&path[14..])?)
         }
@@ -58,8 +74,17 @@ fn route(request: &mut Request, cache: &Cache, publishers: &[String], mut index:
             if !publishers.contains(&artifact.payload.publisher) {
                 return Err(Error::new("forbidden", "publisher is not allowed"));
             }
-            let address=cache.put(&artifact)?;
-            let indexing=index.as_mut().map(|i| if i.ingest(&artifact) {"indexed"} else {"failed"}).unwrap_or("disabled");
+            let address = cache.put(&artifact)?;
+            let indexing = index
+                .as_mut()
+                .map(|i| {
+                    if i.ingest(&artifact) {
+                        "indexed"
+                    } else {
+                        "failed"
+                    }
+                })
+                .unwrap_or("disabled");
             canonical::encode(&serde_json::json!({"address":address,"indexing":indexing}))
         }
         _ => Err(Error::new("not_found", "unknown route")),
@@ -67,11 +92,16 @@ fn route(request: &mut Request, cache: &Cache, publishers: &[String], mut index:
 }
 
 pub fn handle(request: Request, cache: &Cache, publishers: &[String]) -> Result<()> {
-    handle_with_index(request,cache,publishers,None)
+    handle_with_index(request, cache, publishers, None)
 }
 
-pub fn handle_with_index(mut request: Request, cache: &Cache, publishers: &[String], index: Option<&mut Index>) -> Result<()> {
-    let (status, bytes) = match route(&mut request, cache, publishers,index) {
+pub fn handle_with_index(
+    mut request: Request,
+    cache: &Cache,
+    publishers: &[String],
+    index: Option<&mut Index>,
+) -> Result<()> {
+    let (status, bytes) = match route(&mut request, cache, publishers, index) {
         Ok(bytes) => (200, bytes),
         Err(error) => {
             let status = match error.code {
@@ -96,12 +126,17 @@ pub fn handle_with_index(mut request: Request, cache: &Cache, publishers: &[Stri
 }
 
 pub fn serve(server: Server, cache: &Cache, publishers: &[String]) -> Result<()> {
-    serve_with_index(server,cache,publishers,None)
+    serve_with_index(server, cache, publishers, None)
 }
 
-pub fn serve_with_index(server: Server, cache: &Cache, publishers: &[String], mut index: Option<Index>) -> Result<()> {
+pub fn serve_with_index(
+    server: Server,
+    cache: &Cache,
+    publishers: &[String],
+    mut index: Option<Index>,
+) -> Result<()> {
     for request in server.incoming_requests() {
-        if let Err(error) = handle_with_index(request, cache, publishers,index.as_mut()) {
+        if let Err(error) = handle_with_index(request, cache, publishers, index.as_mut()) {
             eprintln!("request failed: {error}");
         }
     }

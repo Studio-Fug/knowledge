@@ -39,7 +39,7 @@ allows future adapters without changing immutable artifacts.
 ```sh
 curl -s http://knowledge:8787/v1/search \
   -H 'Content-Type: application/json' \
-  -d '{"text":"combine RF signals","mode":"semantic","threshold":0.3,"include_incomplete":true}'
+  -d '{"text":"combine RF signals","mode":"semantic","threshold":0.2,"include_incomplete":true}'
 ```
 
 `threshold` is an inclusive cosine threshold between -1 and 1 (default 0.2).
@@ -68,7 +68,7 @@ because the cache has one process owner:
 ```sh
 knowledge index-embeddings
 knowledge index-embeddings --rebuild
-knowledge search 'moving water' --mode semantic --threshold 0.3 --include-incomplete
+knowledge search 'moving water' --mode semantic --threshold 0.2 --include-incomplete
 ```
 
 The commands use the same embedding environment variables. Rebuild regenerates

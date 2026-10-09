@@ -1,10 +1,10 @@
 use clap::{Parser, Subcommand};
 use ed25519_dalek::SigningKey;
 use knowledge::{
-    Error, Result, backing, canonical,
+    Error, Result, backing, canonical, embedding,
     model::{Artifact, Payload, Rigor, ScopeKind},
     query::{self, Query},
-    server, embedding,
+    server,
     store::Cache,
 };
 use rand_core::OsRng;
@@ -118,7 +118,10 @@ enum Command {
         limit: usize,
     },
     /// Build or retry the configured embedding index.
-    IndexEmbeddings { #[arg(long)] rebuild: bool },
+    IndexEmbeddings {
+        #[arg(long)]
+        rebuild: bool,
+    },
     /// Serve public artifacts and queries; read-only and loopback by default.
     Serve {
         #[arg(long, env = "KNOWLEDGE_LISTEN", default_value = "127.0.0.1:8787")]
@@ -298,11 +301,21 @@ fn run(cli: Cli) -> Result<()> {
                 }
                 Command::Put { input } => {
                     let artifact = canonical::parse(&read(&input)?)?;
-                    let address=cache.put(&artifact)?;
-                    let indexing=match embedding::Index::configured(&cache) {
-                        Ok(Some(index)) => if index.status(cache.addresses()?.len()).failures.contains_key(&address) {"failed"} else {"indexed"},
-                        Ok(None)=>"disabled",
-                        Err(_)=>"failed",
+                    let address = cache.put(&artifact)?;
+                    let indexing = match embedding::Index::configured(&cache) {
+                        Ok(Some(index)) => {
+                            if index
+                                .status(cache.addresses()?.len())
+                                .failures
+                                .contains_key(&address)
+                            {
+                                "failed"
+                            } else {
+                                "indexed"
+                            }
+                        }
+                        Ok(None) => "disabled",
+                        Err(_) => "failed",
                     };
                     print(&serde_json::json!({"address":address,"indexing":indexing}))
                 }
@@ -311,7 +324,9 @@ fn run(cli: Cli) -> Result<()> {
                     substituter,
                 } => print(&cache.fetch(&address, &substituter)?),
                 Command::Search {
-                    text, mode, threshold,
+                    text,
+                    mode,
+                    threshold,
                     trust_publisher,
                     include_incomplete,
                     physical,
@@ -321,9 +336,15 @@ fn run(cli: Cli) -> Result<()> {
                     exclude_superseded,
                     limit,
                 } => {
-                    let index=if mode==Some(query::Mode::Lexical) {None} else {embedding::Index::configured(&cache)?};
-                    let query=Query {
-                        text,mode,threshold,
+                    let index = if mode == Some(query::Mode::Lexical) {
+                        None
+                    } else {
+                        embedding::Index::configured(&cache)?
+                    };
+                    let query = Query {
+                        text,
+                        mode,
+                        threshold,
                         trust_publisher,
                         include_incomplete,
                         rigor: if physical {
@@ -336,15 +357,21 @@ fn run(cli: Cli) -> Result<()> {
                         limit,
                         scope,
                     };
-                    let result=embedding::search(&cache,&query,index.as_ref())?;
-                    let mut stdout=std::io::stdout().lock();
-                    stdout.write_all(&canonical::encode_response(&result)?)?; stdout.write_all(b"\n")?;
+                    let result = embedding::search(&cache, &query, index.as_ref())?;
+                    let mut stdout = std::io::stdout().lock();
+                    stdout.write_all(&canonical::encode_response(&result)?)?;
+                    stdout.write_all(b"\n")?;
                     Ok(())
-                },
-                Command::IndexEmbeddings {rebuild} => {
-                    let index=embedding::Index::configure(&cache,rebuild)?.ok_or_else(|| Error::new("embedding_unavailable","configure an embedding endpoint and model"))?;
+                }
+                Command::IndexEmbeddings { rebuild } => {
+                    let index = embedding::Index::configure(&cache, rebuild)?.ok_or_else(|| {
+                        Error::new(
+                            "embedding_unavailable",
+                            "configure an embedding endpoint and model",
+                        )
+                    })?;
                     print(&index.status(cache.addresses()?.len()))
-                },
+                }
                 Command::Serve {
                     listen,
                     allow_network,
@@ -359,8 +386,8 @@ fn run(cli: Cli) -> Result<()> {
                     }
                     let http = server::bind_with_network(listen, allow_network)?;
                     eprintln!("knowledge listening on {listen}; public artifacts only");
-                    let index=embedding::Index::configured(&cache)?;
-                    server::serve_with_index(http, &cache, &allow_publisher,index)
+                    let index = embedding::Index::configured(&cache)?;
+                    server::serve_with_index(http, &cache, &allow_publisher, index)
                 }
                 _ => unreachable!(),
             }

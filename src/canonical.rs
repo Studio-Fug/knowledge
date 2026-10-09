@@ -33,13 +33,20 @@ impl<'de, const FLOATS: bool> Deserialize<'de> for Unique<FLOATS> {
             }
             fn visit_f64<E: de::Error>(self, value: f64) -> std::result::Result<Unique<FLOATS>, E> {
                 if FLOATS {
-                    Number::from_f64(value).map(|n| Unique(Value::Number(n))).ok_or_else(|| E::custom("non-finite numbers are unsupported"))
-                } else { Err(E::custom("floating-point numbers are unsupported")) }
+                    Number::from_f64(value)
+                        .map(|n| Unique(Value::Number(n)))
+                        .ok_or_else(|| E::custom("non-finite numbers are unsupported"))
+                } else {
+                    Err(E::custom("floating-point numbers are unsupported"))
+                }
             }
             fn visit_str<E: de::Error>(self, v: &str) -> std::result::Result<Unique<FLOATS>, E> {
                 Ok(Unique(Value::String(v.into())))
             }
-            fn visit_string<E: de::Error>(self, v: String) -> std::result::Result<Unique<FLOATS>, E> {
+            fn visit_string<E: de::Error>(
+                self,
+                v: String,
+            ) -> std::result::Result<Unique<FLOATS>, E> {
                 Ok(Unique(Value::String(v)))
             }
             fn visit_unit<E: de::Error>(self) -> std::result::Result<Unique<FLOATS>, E> {
@@ -140,13 +147,17 @@ pub fn is_hex(value: &str, bytes: usize) -> bool {
 
 /// API queries may use decimal thresholds; artifact canonicalization stays integer-only.
 pub fn parse_request<T: serde::de::DeserializeOwned>(bytes: &[u8]) -> Result<T> {
-    if bytes.len() > MAX_BYTES { return Err(Error::new("too_large", "request exceeds 4 MiB")); }
+    if bytes.len() > MAX_BYTES {
+        return Err(Error::new("too_large", "request exceeds 4 MiB"));
+    }
     let Unique(value): Unique<true> = serde_json::from_slice(bytes)?;
     Ok(serde_json::from_value(value)?)
 }
 
 pub fn encode_response<T: Serialize>(value: &T) -> Result<Vec<u8>> {
     let bytes = serde_json::to_vec(value)?;
-    if bytes.len() > MAX_BYTES { return Err(Error::new("too_large", "response exceeds 4 MiB")); }
+    if bytes.len() > MAX_BYTES {
+        return Err(Error::new("too_large", "response exceeds 4 MiB"));
+    }
     Ok(bytes)
 }

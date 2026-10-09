@@ -23,7 +23,10 @@ pub struct Query {
 
 #[derive(Debug, Clone, Copy, Deserialize, Serialize, clap::ValueEnum, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
-pub enum Mode { Lexical, Semantic }
+pub enum Mode {
+    Lexical,
+    Semantic,
+}
 
 #[derive(Serialize)]
 pub struct Search {
@@ -84,7 +87,11 @@ fn close(a: &str, b: &str) -> bool {
     edits + (a.len() - i) + (b.len() - j) <= 1
 }
 
-pub(crate) fn candidates(cache: &Cache, query: &Query, lexical: bool) -> Result<(Vec<(crate::model::Artifact, Summary)>, usize)> {
+pub(crate) fn candidates(
+    cache: &Cache,
+    query: &Query,
+    lexical: bool,
+) -> Result<(Vec<(crate::model::Artifact, Summary)>, usize)> {
     if query.text.len() > 8192 || query.limit > 100 {
         return Err(Error::new("invalid_query", "query exceeds limits"));
     }
@@ -95,7 +102,15 @@ pub(crate) fn candidates(cache: &Cache, query: &Query, lexical: bool) -> Result<
     {
         return Err(Error::new("invalid_key", "invalid trusted publisher"));
     }
-    if query.threshold.is_some_and(|t| !t.is_finite() || !(-1.0..=1.0).contains(&t)) { return Err(Error::new("invalid_query", "threshold must be between -1 and 1")); }
+    if query
+        .threshold
+        .is_some_and(|t| !t.is_finite() || !(-1.0..=1.0).contains(&t))
+    {
+        return Err(Error::new(
+            "invalid_query",
+            "threshold must be between -1 and 1",
+        ));
+    }
     let wanted = tokens(&query.text);
     let addresses = cache.addresses()?;
     let mut eligible = Vec::new();
@@ -154,7 +169,10 @@ pub(crate) fn candidates(cache: &Cache, query: &Query, lexical: bool) -> Result<
     Ok((eligible, addresses.len()))
 }
 
-pub(crate) fn select(eligible: Vec<(crate::model::Artifact, Summary)>, query: &Query) -> Vec<Summary> {
+pub(crate) fn select(
+    eligible: Vec<(crate::model::Artifact, Summary)>,
+    query: &Query,
+) -> Vec<Summary> {
     let superseded: BTreeSet<_> = eligible
         .iter()
         .flat_map(|(a, _)| {
@@ -182,5 +200,10 @@ pub(crate) fn select(eligible: Vec<(crate::model::Artifact, Summary)>, query: &Q
 
 pub fn search(cache: &Cache, query: &Query) -> Result<Search> {
     let (eligible, scanned) = candidates(cache, query, true)?;
-    Ok(Search { matches: select(eligible, query), scanned, scope: "local_cache; publisher_assertions; eligible_revisions_only", semantic: None })
+    Ok(Search {
+        matches: select(eligible, query),
+        scanned,
+        scope: "local_cache; publisher_assertions; eligible_revisions_only",
+        semantic: None,
+    })
 }
