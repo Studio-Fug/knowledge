@@ -23,7 +23,7 @@ fn nonlexical_similarity_is_thresholded_and_survives_restart_without_reembedding
  let calls=Arc::new(AtomicUsize::new(0));let mut index=Index::open(&cache,provider(calls.clone(),"a",false)).unwrap();index.backfill(&cache).unwrap();
  assert_eq!(calls.load(Ordering::SeqCst),2);
  let result=index.search(&cache,&query()).unwrap();assert_eq!(result.matches.len(),1);assert_eq!(result.matches[0].address,address);assert!(!result.matches[0].reusable);
- let evidence=result.semantic.unwrap();evidence.query_embedding.validate().unwrap();evidence.object_embeddings[&address].validate().unwrap();
+ let evidence=result.semantic.unwrap();evidence.record.query_embedding.validate().unwrap();evidence.record.object_embeddings[&address].validate().unwrap();
  assert!(knowledge::query::search(&cache,&query()).unwrap().matches.is_empty());
  let before=calls.load(Ordering::SeqCst);drop(index);
  let mut index=Index::open(&cache,provider(calls.clone(),"a",false)).unwrap();index.backfill(&cache).unwrap();assert_eq!(calls.load(Ordering::SeqCst),before);
@@ -39,7 +39,7 @@ fn malformed_vectors_and_tampered_records_are_visible_and_never_used() {
  let mut index=Index::open(&cache,provider(calls.clone(),"a",false)).unwrap();index.backfill(&cache).unwrap();
  let recipe=canonical::digest(&canonical::encode(&provider(calls.clone(),"a",false).recipe()).unwrap());
  let path=root.path().join("embeddings").join(recipe).join(format!("{address}.json"));let mut record:serde_json::Value=serde_json::from_slice(&std::fs::read(&path).unwrap()).unwrap();record["record"]["vector_bits"][0]=0.into();std::fs::write(&path,serde_json::to_vec(&record).unwrap()).unwrap();
- let mut restarted=Index::open(&cache,provider(calls,"a",false)).unwrap();restarted.backfill(&cache).unwrap();let search=restarted.search(&cache,&query()).unwrap();assert!(search.matches.is_empty());assert_eq!(search.semantic.unwrap().skipped[&address],"invalid_embedding");assert_eq!(cache.get(&address).unwrap().address().unwrap(),address);
+ let mut restarted=Index::open(&cache,provider(calls,"a",false)).unwrap();restarted.backfill(&cache).unwrap();let search=restarted.search(&cache,&query()).unwrap();assert!(search.matches.is_empty());assert_eq!(search.semantic.unwrap().record.skipped[&address],"invalid_embedding");assert_eq!(cache.get(&address).unwrap().address().unwrap(),address);
 }
 #[test]
 fn api_decimals_do_not_change_artifact_canonicalization_or_allow_duplicate_keys() {
@@ -97,4 +97,21 @@ fn real_model_discovers_a_container_for_carrying_water_without_lexical_overlap()
  let high=result.matches[0].similarity.unwrap();let low=result.matches[1].similarity.unwrap();assert!(high>low);
  let selected=index.search(&cache,&Query {threshold:Some((high+low)/2.0),..q}).unwrap();assert_eq!(selected.matches.len(),1);assert_eq!(selected.matches[0].address,address);
  println!("REAL_EMBEDDING_MODEL:{}",model);println!("BUCKET_SIMILARITY:{high}; LAMP_SIMILARITY:{low}");
+}
+
+#[test]
+#[ignore="requires a real Ollama model and pinned public catalog artifact"]
+fn real_model_indexes_the_multichunk_core_artifact_and_its_actual_signed_bytes() {
+ use std::io::Read;
+ let root=tempfile::tempdir().unwrap();let cache=Cache::open(root.path()).unwrap();
+ let mut bytes=Vec::new();ureq::get("https://raw.githubusercontent.com/Studio-Fug/28ghz-2way-power-divider/7688adb7f19feb475dbbd40aa60f916cde5e4a09/knowledge/artifact.json").call().unwrap().into_reader().take((canonical::MAX_BYTES+1) as u64).read_to_end(&mut bytes).unwrap();
+ assert_eq!(canonical::digest(&bytes),"a462549b5c495b935125a5a705e2d238e7d6f9a29d95990c9e599a47ad0d9824");
+ let artifact:Artifact=canonical::parse(&bytes).unwrap();let address=cache.put(&artifact).unwrap();
+ assert_eq!(address,"9cdb703565b6e97f87064670c3646c4d566506af4e155964fe5069bd6695b88e");
+ let backend=embedding::Ollama::connect(&std::env::var("KNOWLEDGE_EMBEDDING_ENDPOINT").unwrap(),&std::env::var("KNOWLEDGE_EMBEDDING_MODEL").unwrap()).unwrap();
+ let mut index=Index::open(&cache,Box::new(backend)).unwrap();assert!(index.ingest(&artifact),"{:?}",index.status(1).failures);
+ let result=index.search(&cache,&Query {text:"combine RF signals".into(),threshold:Some(-1.0),..query()}).unwrap();assert_eq!(result.matches[0].address,address);
+ let evidence=result.semantic.unwrap();assert!(evidence.record.object_embeddings[&address].record.chunks>1);assert_eq!(evidence.record.object_embeddings[&address].record.input_sha256,address);
+ assert_eq!(evidence.sha256,canonical::digest(&canonical::encode(&evidence.record).unwrap()));
+ println!("DIVIDER_SIMILARITY:{:?}; CHUNKS:{}",result.matches[0].similarity,evidence.record.object_embeddings[&address].record.chunks);
 }

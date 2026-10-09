@@ -1,0 +1,67 @@
+---
+requirements:
+- id: REQ-116
+  title: Structured-object embeddings
+  description: When semantic embedding is configured, the CACHE shall ingest every
+    stored object's complete signed structured representation into an embedding
+    model and retain a vector derived from that representation. Initial ingestion
+    and subsequent publication shall be covered. Bounded chunking may be used;
+    silently dropping fields or truncating content shall not count as complete ingestion.
+  refines: [REQ-103]
+  status: approved
+  modules: [src/embedding.rs, src/server.rs]
+  method: TM-007
+  tags: [discovery, initial, embeddings]
+- id: REQ-117
+  title: Thresholded vector search
+  description: Semantic search shall embed the query in the configured model's
+    embedding space, compare vectors using a declared similarity metric, apply
+    a caller-configurable threshold, and return similarity scores. The initial
+    metric shall be cosine similarity with an inclusive threshold; results shall
+    be ordered by descending score with a deterministic CONTENT ADDRESS tie-break.
+    Explicit semantic requests shall not silently fall back to lexical search.
+  refines: [REQ-103]
+  status: approved
+  modules: [src/embedding.rs, src/query.rs, src/server.rs, src/main.rs]
+  method: TM-007
+  tags: [discovery, initial, embeddings]
+- id: REQ-118
+  title: Committed embedding derivation and query provenance
+  description: Derived embedding records shall commit to the exact input, model
+    identity and revision, preprocessing recipe and vector bytes. Results shall
+    expose committed query and object derivations, threshold, filters and known
+    local search scope. Changing model or recipe shall not reuse an incompatible
+    index. Embeddings are derived search data, not verification evidence, semantic
+    decomposition revisions or a new first-class database object type; changing
+    constituent semantic claims shall still require a new immutable artifact.
+  refines: [REQ-103]
+  status: approved
+  modules: [src/embedding.rs, src/canonical.rs]
+  method: TM-007
+  tags: [discovery, integrity, embeddings]
+- id: REQ-119
+  title: Embedding checking and claim scope
+  description: Embedding search shall preserve verification, rigor, subject scope
+    and version filters. Supported-capability and rigor-filtered semantic matches
+    shall be established against qualifying individual claims, not an unrelated
+    claim elsewhere in the object. Missing, failed, malformed or incompatible
+    embeddings shall be explicit and shall never establish verification, reuse
+    eligibility or exhaustive search coverage.
+  refines: [REQ-103]
+  status: approved
+  modules: [src/embedding.rs, src/query.rs, src/model.rs, src/server.rs]
+  method: TM-007
+  tags: [discovery, verification, embeddings]
+test_methods:
+- id: TM-007
+  title: Embedding ingestion and semantic retrieval
+  level: simulation
+  procedure: Capture model inputs and reconstruct the complete canonical signed
+    object, including UTF-8 chunk boundaries. Test inclusive cosine thresholds,
+    ordering, restart reuse, model changes, record tampering, invalid vectors,
+    unavailable models, API decimal parsing and supported-claim/rigor isolation.
+    Separately run an actual language embedding model to retrieve a bucket for a
+    moving-water query without lexical overlap and reject a less similar lamp by
+    a threshold between their scores. Synthetic vectors alone do not establish
+    semantic quality. Test a real multi-chunk catalog artifact and configured HTTP
+    ingestion/search. Model quality remains empirical and domain-dependent.

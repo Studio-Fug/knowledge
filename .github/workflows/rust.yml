@@ -42,6 +42,7 @@ jobs:
             sleep 1
           done
           docker exec embedding-model ollama pull embeddinggemma
+          curl --fail -s http://127.0.0.1:11434/api/embed -d '{"model":"embeddinggemma:latest","input":"test","truncate":false}' | jq '{model,dimensions:(.embeddings[0]|length)}' 
       - name: Test real semantic retrieval
         env:
           KNOWLEDGE_EMBEDDING_ENDPOINT: http://127.0.0.1:11434

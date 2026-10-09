@@ -70,7 +70,9 @@ impl Embedder for Ollama {
         let body = serde_json::to_string(&serde_json::json!({"model":self.recipe.model,"input":inputs,"truncate":false}))?;
         let response = self.agent.post(&format!("{}/api/embed",self.recipe.endpoint)).set("Content-Type","application/json").send_string(&body).map_err(|_| Error::new("embedding_unavailable", "embedding request failed; input was not silently truncated"))?;
         let value = Self::read(response)?;
-        if value["model"].as_str() != Some(self.recipe.model.as_str()) || self.identity()?.1 != self.recipe.revision { return Err(Error::new("embedding_model_changed", "embedding response does not match the pinned model")); }
+        let returned=value["model"].as_str();
+        let matching=returned.is_none_or(|name| name==self.recipe.model || self.recipe.model.strip_suffix(":latest")==Some(name));
+        if !matching || self.identity()?.1 != self.recipe.revision { return Err(Error::new("embedding_model_changed", "embedding response does not match the pinned model")); }
         serde_json::from_value(value["embeddings"].clone()).map_err(|_| Error::new("invalid_embedding", "embedding service returned malformed vectors"))
     }
 }
@@ -149,6 +151,12 @@ pub struct IndexStatus {
 }
 #[derive(Serialize)]
 pub struct SearchEvidence {
+    pub sha256: String,
+    #[serde(flatten)]
+    pub record: SearchRecord,
+}
+#[derive(Serialize)]
+pub struct SearchRecord {
     pub query: String,
     pub filters: serde_json::Value,
     pub scope_artifacts: Vec<String>,
@@ -157,6 +165,9 @@ pub struct SearchEvidence {
     pub object_embeddings: BTreeMap<String,Receipt>,
     pub skipped: BTreeMap<String,String>,
     pub qualifying_claim_embeddings: BTreeMap<String,Receipt>,
+    pub considered_embeddings: BTreeMap<String,String>,
+    pub scored_claim_embeddings: BTreeMap<String,String>,
+    pub scores_bits: BTreeMap<String,u64>,
     pub scoring: &'static str,
 }
 
@@ -246,8 +257,12 @@ impl Index {
         let threshold=query.threshold.unwrap_or(0.6);
         let mut eligible=Vec::new(); let mut skipped=BTreeMap::new();
         let mut qualifying=BTreeMap::new();
+        let mut considered=BTreeMap::new();
+        let mut scored_claims=BTreeMap::new();
+        let mut scores=BTreeMap::new();
         for (artifact,mut summary) in candidates {
             let Some(object)=self.records.get(&summary.address) else {skipped.insert(summary.address,self.failures.get(&artifact.address()?).cloned().unwrap_or_else(|| "not_indexed".into()));continue;};
+            considered.insert(summary.address.clone(),object.sha256.clone());
             let vector=object.vector();
             if vector.len()!=query_vector.len() { return Err(Error::new("invalid_embedding", "query and object embedding dimensions differ")); }
             let mut score=cosine(&query_vector,&vector)?;
@@ -261,8 +276,10 @@ impl Index {
                 }
                 let Some((similarity,receipt))=best else {continue;};
                 score=similarity;
+                scored_claims.insert(summary.address.clone(),receipt.sha256.clone());
                 qualifying.insert(summary.address.clone(),receipt);
             }
+            scores.insert(summary.address.clone(),score.to_bits());
             if score>=threshold {summary.similarity=Some(score);eligible.push((artifact,summary));}
         }
         eligible.sort_by(|(_,a),(_,b)| b.similarity.partial_cmp(&a.similarity).unwrap_or(std::cmp::Ordering::Equal).then_with(|| a.address.cmp(&b.address)));
@@ -271,7 +288,9 @@ impl Index {
         let records=matches.iter().map(|s|(s.address.clone(),self.records[&s.address].clone())).collect();
         let mut filters=serde_json::to_value(query)?;
         filters.as_object_mut().ok_or_else(|| Error::new("invalid_query","query is not an object"))?.remove("threshold");
-        Ok(Search {matches,scanned,scope:"local_cache; semantic_similarity; publisher_assertions; eligible_revisions_only",semantic:Some(SearchEvidence {query:query.text.clone(),filters,scope_artifacts:cache.addresses()?,threshold_bits:threshold.to_bits(),query_embedding:embedding,object_embeddings:records,skipped,qualifying_claim_embeddings:qualifying,scoring:"inclusive cosine threshold; qualifying claim vectors for rigor/support filters, whole-object vector otherwise; descending similarity; address tie-break"})})
+        let record=SearchRecord {query:query.text.clone(),filters,scope_artifacts:cache.addresses()?,threshold_bits:threshold.to_bits(),query_embedding:embedding,object_embeddings:records,skipped,qualifying_claim_embeddings:qualifying,considered_embeddings:considered,scored_claim_embeddings:scored_claims,scores_bits:scores,scoring:"inclusive cosine threshold; qualifying claim vectors for rigor/support filters, whole-object vector otherwise; descending similarity; address tie-break"};
+        let sha256=canonical::digest(&canonical::encode(&record)?);
+        Ok(Search {matches,scanned,scope:"local_cache; semantic_similarity; publisher_assertions; eligible_revisions_only",semantic:Some(SearchEvidence {sha256,record})})
     }
 }
 
