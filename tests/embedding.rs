@@ -55,6 +55,7 @@ fn query() -> Query {
         text: "moving water".into(),
         mode: Some(Mode::Semantic),
         threshold: Some(1.0),
+        include_provenance: true,
         include_incomplete: true,
         ..Query::default()
     }
@@ -75,6 +76,16 @@ fn nonlexical_similarity_is_thresholded_and_survives_restart_without_reembedding
     assert_eq!(result.matches.len(), 1);
     assert_eq!(result.matches[0].address, address);
     assert!(!result.matches[0].reusable);
+    let compact_query = Query {
+        include_provenance: false,
+        ..query()
+    };
+    let compact = index.search(&cache, &compact_query).unwrap();
+    assert_eq!(compact.matches[0].address, address);
+    assert!(compact.semantic.is_none());
+    let compact_json = serde_json::to_value(&compact).unwrap();
+    assert!(compact_json.get("semantic").is_none());
+    assert!(compact_json.get("skipped").is_none());
     let evidence = result.semantic.unwrap();
     evidence.record.query_embedding.validate().unwrap();
     evidence.record.object_embeddings[&address]
@@ -134,6 +145,7 @@ fn malformed_vectors_and_tampered_records_are_visible_and_never_used() {
     restarted.backfill(&cache).unwrap();
     let search = restarted.search(&cache, &query()).unwrap();
     assert!(search.matches.is_empty());
+    assert_eq!(search.skipped[&address], "invalid_embedding");
     assert_eq!(
         search.semantic.unwrap().record.skipped[&address],
         "invalid_embedding"
@@ -467,6 +479,7 @@ fn configured_http_ingestion_indexes_new_objects_and_semantic_requests_use_the_i
     let result: serde_json::Value = serde_json::from_str(&body).unwrap();
     assert_eq!(result["matches"].as_array().unwrap().len(), 1);
     assert_eq!(result["matches"][0]["similarity"], 1.0);
+    assert!(result.get("semantic").is_none());
     let mut body = String::new();
     ureq::get(&format!("{endpoint}/v1/embeddings/status"))
         .call()

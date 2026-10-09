@@ -628,6 +628,7 @@ impl Index {
             .as_object_mut()
             .ok_or_else(|| Error::new("invalid_query", "query is not an object"))?
             .remove("threshold");
+        let skipped_summary = skipped.clone();
         let record = SearchRecord {
             query: query.text.clone(),
             filters,
@@ -647,7 +648,10 @@ impl Index {
             matches,
             scanned,
             scope: "local_cache; semantic_similarity; publisher_assertions; eligible_revisions_only",
-            semantic: Some(SearchEvidence { sha256, record }),
+            semantic: query
+                .include_provenance
+                .then_some(SearchEvidence { sha256, record }),
+            skipped: skipped_summary,
         })
     }
 }

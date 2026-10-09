@@ -12,6 +12,7 @@ pub struct Query {
     pub text: String,
     pub mode: Option<Mode>,
     pub threshold: Option<f64>,
+    pub include_provenance: bool,
     pub trust_publisher: Option<String>,
     pub include_incomplete: bool,
     pub rigor: Option<Rigor>,
@@ -35,6 +36,8 @@ pub struct Search {
     pub scope: &'static str,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub semantic: Option<crate::embedding::SearchEvidence>,
+    #[serde(skip_serializing_if = "std::collections::BTreeMap::is_empty")]
+    pub skipped: std::collections::BTreeMap<String, String>,
 }
 
 fn tokens(text: &str) -> BTreeSet<String> {
@@ -205,5 +208,6 @@ pub fn search(cache: &Cache, query: &Query) -> Result<Search> {
         scanned,
         scope: "local_cache; publisher_assertions; eligible_revisions_only",
         semantic: None,
+        skipped: Default::default(),
     })
 }

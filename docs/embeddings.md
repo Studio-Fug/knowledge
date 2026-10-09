@@ -102,7 +102,12 @@ before and after inference. Existing records are integrity/binding checked on
 restart; changing the model/recipe selects a separate index. A model digest is a
 provider assertion, not remote attestation of faithful model execution.
 
-Search returns a hashed provenance record with the query vector, returned object
+Search responses are compact by default: matches, similarity scores, scope and
+scan count. Failed object embeddings remain visible in a compact `skipped` map.
+Set `"include_provenance": true` in the query JSON (or CLI
+`--include-provenance`) to request the full hashed provenance record.
+
+The opt-in record includes the query vector, returned object
 vectors, qualifying claim vectors, all considered vector-record commitments,
 score bits, threshold bits, filters and the local artifact-address snapshot.
 It permits score/filter replay using those exact committed inputs. Other considered

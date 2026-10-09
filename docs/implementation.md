@@ -53,11 +53,11 @@ inserted is public to anyone who can reach this server.
 | `GET /health` | Mode and status |
 | `GET /v1/artifacts/<sha256>` | Complete signed public artifact |
 | `POST /v1/artifacts` with artifact JSON | Validated artifact address |
-| `POST /v1/search` with query JSON | Summaries, optional similarity/provenance and checking limits |
+| `POST /v1/search` with query JSON | Summaries, similarity and checking limits; full vectors/provenance only with `include_provenance: true` |
 | `GET /v1/embeddings/status` | Optional model index status and failures |
 
 An empty query `{}` lists up to 20 publisher-reported complete artifacts. Query
-fields are `text`, `mode`, `threshold`, `trust_publisher`, `include_incomplete`, `rigor`, `scope`,
+fields are `text`, `mode`, `threshold`, `include_provenance`, `trust_publisher`, `include_incomplete`, `rigor`, `scope`,
 `supported_claims_only`, `exclude_superseded`, and `limit` (maximum 100).
 Rigor categories are `analysis`, `simulation`, `software`, and `physical`;
 they are exact categories, not a universal ordering. Scope is `design`, `batch`,

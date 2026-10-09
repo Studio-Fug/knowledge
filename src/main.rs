@@ -100,6 +100,9 @@ enum Command {
         mode: Option<query::Mode>,
         #[arg(long)]
         threshold: Option<f64>,
+        /// Include full hashed semantic provenance and embedding vectors.
+        #[arg(long)]
+        include_provenance: bool,
         #[arg(long)]
         trust_publisher: Option<String>,
         #[arg(long)]
@@ -327,6 +330,7 @@ fn run(cli: Cli) -> Result<()> {
                     text,
                     mode,
                     threshold,
+                    include_provenance,
                     trust_publisher,
                     include_incomplete,
                     physical,
@@ -345,6 +349,7 @@ fn run(cli: Cli) -> Result<()> {
                         text,
                         mode,
                         threshold,
+                        include_provenance,
                         trust_publisher,
                         include_incomplete,
                         rigor: if physical {
