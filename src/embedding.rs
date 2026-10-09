@@ -189,12 +189,19 @@ impl Index {
         fs::create_dir_all(&directory)?; regular(&directory)?;
         Ok(Self {provider,directory,records:BTreeMap::new(),failures:BTreeMap::new()})
     }
-    pub fn configured(cache: &Cache) -> Result<Option<Self>> {
+    pub fn configured(cache: &Cache) -> Result<Option<Self>> {Self::configure(cache,false)}
+    pub fn configure(cache: &Cache, rebuild: bool) -> Result<Option<Self>> {
         let endpoint=std::env::var("KNOWLEDGE_EMBEDDING_ENDPOINT").unwrap_or_default();
         let model=std::env::var("KNOWLEDGE_EMBEDDING_MODEL").unwrap_or_default();
         if endpoint.is_empty() && model.is_empty() { return Ok(None); }
         let provider=Ollama::connect(&endpoint,&model)?;
         let mut index=Self::open(cache,Box::new(provider))?;
+        if rebuild {
+            for entry in fs::read_dir(&index.directory)? {
+                let path=entry?.path();regular(&path)?;
+                if path.is_file() {fs::remove_file(path)?;}
+            }
+        }
         index.backfill(cache)?;
         Ok(Some(index))
     }
@@ -217,16 +224,31 @@ impl Index {
             let bytes=canonical::encode(artifact)?;
             let text=std::str::from_utf8(&bytes).map_err(|_| Error::new("invalid_embedding", "canonical artifact is not UTF-8"))?;
             let receipt=produce(self.provider.as_ref(),text,"artifact")?;
-            let mut temp=tempfile::NamedTempFile::new_in(&self.directory)?;
-            temp.write_all(&canonical::encode(&receipt)?)?; temp.as_file().sync_all()?;
-            temp.persist_noclobber(path).map_err(|_| Error::new("io", "embedding record installation failed"))?;
-            #[cfg(unix)] File::open(&self.directory)?.sync_all()?;
+            self.install(&path,&receipt)?;
             Ok(receipt)
         })();
         match attempt {
             Ok(receipt)=>{self.failures.remove(&address);self.records.insert(address,receipt);true}
             Err(error)=>{self.records.remove(&address);self.failures.insert(address,error.code.into());false}
         }
+    }
+    fn install(&self,path: &std::path::Path,receipt: &Receipt) -> Result<()> {
+        let bytes=canonical::encode(receipt)?;
+        let mut size=0u64;
+        for recipe in fs::read_dir(self.directory.parent().ok_or_else(|| Error::new("unsafe_path","missing embedding parent"))?)? {
+            let directory=recipe?.path();regular(&directory)?;
+            if !directory.is_dir() {continue;}
+            for entry in fs::read_dir(directory)? {
+                let path=entry?.path();regular(&path)?;
+                size=size.checked_add(fs::metadata(path)?.len()).ok_or_else(|| Error::new("index_full","embedding storage size overflow"))?;
+            }
+        }
+        if size+bytes.len() as u64>128*1024*1024 {return Err(Error::new("index_full","embedding index exceeds 128 MiB across model revisions"));}
+        let mut temp=tempfile::NamedTempFile::new_in(&self.directory)?;
+        temp.write_all(&bytes)?;temp.as_file().sync_all()?;
+        temp.persist_noclobber(path).map_err(|_| Error::new("io","embedding record installation failed"))?;
+        #[cfg(unix)] File::open(&self.directory)?.sync_all()?;
+        Ok(())
     }
     fn claim_embedding(&self, address: &str, position: usize, claim: &crate::model::Claim) -> Result<Receipt> {
         let bytes=canonical::encode(&serde_json::json!({"artifact_sha256":address,"claim_index":position,"claim":claim}))?;
@@ -241,9 +263,7 @@ impl Index {
         }
         let text=std::str::from_utf8(&bytes).map_err(|_| Error::new("invalid_embedding","claim is not UTF-8"))?;
         let receipt=produce(self.provider.as_ref(),text,"claim")?;
-        let mut temp=tempfile::NamedTempFile::new_in(&self.directory)?;
-        temp.write_all(&canonical::encode(&receipt)?)?; temp.as_file().sync_all()?;
-        temp.persist_noclobber(path).map_err(|_| Error::new("io","claim embedding installation failed"))?;
+        self.install(&path,&receipt)?;
         Ok(receipt)
     }
     pub fn status(&self, total: usize) -> IndexStatus {

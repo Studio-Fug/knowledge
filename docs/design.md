@@ -184,3 +184,23 @@ commitments enter the enclosing artifact hash, avoiding circular report binding.
 The [backing design](backing.md) and [traceability](traceability.md) define initial
 limitations and software evidence. Direct Git transport and private-source
 authorization can be added later without silently redefining this format.
+
+## Semantic embedding decision
+
+REQ-116–119 add an optional cache-owned model index over every complete signed
+object's structured representation. Queries are embedded in the same model space,
+compared by cosine similarity and thresholded before deterministic ranking.
+The first backend is local Ollama; a Rust adapter trait keeps the core extensible.
+
+Embeddings are operational derivations with committed inputs, model/recipe identity
+and exact vector outputs. Search also commits its threshold, filters and known
+local scope. They create neither publisher verification claims nor new first-class
+artifact types. Signed semantic-label revisions still create new artifacts.
+Qualifying individual claims are embedded separately for support/rigor queries so
+a passing report elsewhere in an object cannot qualify an unverified capability.
+
+We retain the small single-process cache and a linear vector scan, avoiding a
+separate vector database. Bounded chunking covers all structured bytes; no field
+is silently omitted. Whole-object mean vectors may lose relevant details in large
+or binary-heavy objects. Quality and thresholds need empirical evaluation, and
+model similarity never establishes evidence truth. See [embeddings.md](embeddings.md).

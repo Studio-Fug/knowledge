@@ -115,3 +115,33 @@ fn real_model_indexes_the_multichunk_core_artifact_and_its_actual_signed_bytes()
  assert_eq!(evidence.sha256,canonical::digest(&canonical::encode(&evidence.record).unwrap()));
  println!("DIVIDER_SIMILARITY:{:?}; CHUNKS:{}",result.matches[0].similarity,evidence.record.object_embeddings[&address].record.chunks);
 }
+
+#[test]
+fn ollama_adapter_uses_all_chunks_disables_truncation_and_checks_model_identity() {
+ use std::{io::Read,thread};
+ use tiny_http::{Server,Response};
+ let server=Server::http("127.0.0.1:0").unwrap();let endpoint=format!("http://{}",server.server_addr());
+ let thread=thread::spawn(move || {
+  for position in 0..4 {
+   let mut request=server.recv_timeout(std::time::Duration::from_secs(10)).unwrap().unwrap();
+   let response=if position==2 {
+    assert_eq!(request.url(),"/api/embed");let mut body=String::new();request.as_reader().read_to_string(&mut body).unwrap();let value:serde_json::Value=serde_json::from_str(&body).unwrap();assert_eq!(value["truncate"],false);assert_eq!(value["input"],serde_json::json!(["bucket","lamp"]));
+    // Ollama versions may omit model in the response; the explicit request and
+    // before/after manifest digest still pin the inference model.
+    serde_json::json!({"embeddings":[[1.0,0.0],[0.0,1.0]]})
+   } else {assert_eq!(request.url(),"/api/tags");serde_json::json!({"models":[{"name":"test:latest","digest":"a".repeat(64)}]})};
+   request.respond(Response::from_string(response.to_string())).unwrap();
+  }
+ });
+ let backend=embedding::Ollama::connect(&endpoint,"test").unwrap();assert_eq!(backend.recipe().revision,"a".repeat(64));assert_eq!(backend.embed(&["bucket".into(),"lamp".into()]).unwrap().len(),2);thread.join().unwrap();
+}
+
+#[test]
+fn configured_http_ingestion_indexes_new_objects_and_semantic_requests_use_the_index() {
+ use std::{thread,io::Read};
+ let root=tempfile::tempdir().unwrap();let server=knowledge::server::bind("127.0.0.1:0".parse().unwrap()).unwrap();let endpoint=format!("http://{}",server.server_addr());let object=artifact("bucket");let publisher=object.payload.publisher.clone();let bytes=canonical::encode(&object).unwrap();
+ let thread=thread::spawn(move || {let cache=Cache::open(root.path()).unwrap();let mut index=Index::open(&cache,provider(Arc::new(AtomicUsize::new(0)),"a",false)).unwrap();for _ in 0..3 {let request=server.recv_timeout(std::time::Duration::from_secs(10)).unwrap().unwrap();knowledge::server::handle_with_index(request,&cache,std::slice::from_ref(&publisher),Some(&mut index)).unwrap();}});
+ let response=ureq::post(&format!("{endpoint}/v1/artifacts")).send_bytes(&bytes).unwrap();let mut body=String::new();response.into_reader().read_to_string(&mut body).unwrap();assert_eq!(serde_json::from_str::<serde_json::Value>(&body).unwrap()["indexing"],"indexed");
+ let mut body=String::new();ureq::post(&format!("{endpoint}/v1/search")).send_string(r#"{"text":"moving water","mode":"semantic","threshold":0.9,"include_incomplete":true}"#).unwrap().into_reader().read_to_string(&mut body).unwrap();let result:serde_json::Value=serde_json::from_str(&body).unwrap();assert_eq!(result["matches"].as_array().unwrap().len(),1);assert_eq!(result["matches"][0]["similarity"],1.0);
+ let mut body=String::new();ureq::get(&format!("{endpoint}/v1/embeddings/status")).call().unwrap().into_reader().read_to_string(&mut body).unwrap();assert_eq!(serde_json::from_str::<serde_json::Value>(&body).unwrap()["indexed"],1);thread.join().unwrap();
+}

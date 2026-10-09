@@ -175,3 +175,19 @@ redirects limit network contact; allowlisted destinations must be trusted, and
 comprehensive DNS/IP isolation is not implemented. Availability remains dependent
 on external hosts (RISK-011). Commit IDs and successful downloads never substitute
 for realization hashes. See [backing.md](backing.md) for precise limits.
+
+## Semantic embedding risks
+
+Embeddings add model-service disclosure, search poisoning and model drift to the
+existing discovery/remote-work boundaries (RISK-005/008/010/011). Only explicitly
+configured endpoints receive complete public object data and queries; no redirects
+or credential-bearing URLs are accepted. Bounded requests, vector dimensions and
+index storage constrain resource use. Host/model-service compromise remains a
+trust boundary, not something hashing can eliminate.
+
+Exact input/model/vector commitments and committed query scope support replay;
+changed recipes select separate indexes, and missing/corrupt vectors are explicit.
+Similarity can still retrieve irrelevant designs or miss useful ones. Claim-scoped
+rigor/support matching prevents unrelated passing evidence from qualifying a
+semantic capability. These controls do not authenticate physical measurements,
+prove complete search recall or accept residual risk.

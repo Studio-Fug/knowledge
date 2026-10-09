@@ -53,10 +53,11 @@ inserted is public to anyone who can reach this server.
 | `GET /health` | Mode and status |
 | `GET /v1/artifacts/<sha256>` | Complete signed public artifact |
 | `POST /v1/artifacts` with artifact JSON | Validated artifact address |
-| `POST /v1/search` with query JSON | Summaries and checking limits |
+| `POST /v1/search` with query JSON | Summaries, optional similarity/provenance and checking limits |
+| `GET /v1/embeddings/status` | Optional model index status and failures |
 
 An empty query `{}` lists up to 20 publisher-reported complete artifacts. Query
-fields are `text`, `trust_publisher`, `include_incomplete`, `rigor`, `scope`,
+fields are `text`, `mode`, `threshold`, `trust_publisher`, `include_incomplete`, `rigor`, `scope`,
 `supported_claims_only`, `exclude_superseded`, and `limit` (maximum 100).
 Rigor categories are `analysis`, `simulation`, `software`, and `physical`;
 they are exact categories, not a universal ordering. Scope is `design`, `batch`,
@@ -103,10 +104,11 @@ always remains unchecked in a search/inspect summary; [realize](backing.md) chec
 its commitments before exporting it. Even then, the output explicitly says
 tests were not rerun. This prototype has no independently-checked status.
 
-Search is a deterministic scan using labels, aliases, token stemming, and one
-character fuzzy matching. Supply common capability labels such as “moves water”
-for pumps, buckets, and aqueducts. It does not yet infer decompositions from
-arbitrary designs or use embeddings. Query filtering is per supported claim;
+Without an embedding endpoint, search is a deterministic scan using labels,
+aliases, token stemming, and one-character fuzzy matching. Supply common capability labels such as “moves water”
+for pumps, buckets, and aqueducts. [Optional model embeddings](embeddings.md) provide thresholded semantic search.
+The cache does not rewrite semantic decompositions or infer verification from
+model similarity. Query filtering is per supported claim;
 unrelated physical evidence does not satisfy a physical capability query.
 
 An explicit `revision` predecessor may hide an older artifact only when the new

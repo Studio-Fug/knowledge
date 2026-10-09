@@ -33,3 +33,16 @@ cargo test --locked --test container -- --ignored --test-threads=1
 [Backing-source design](backing.md) specifies the representation and normalization.
 Unit fixtures are synthetic evidence of software behavior. CI results establish
 which tests actually passed; this table alone is not a certification.
+
+## Semantic embedding slice
+
+| Requirement | Implementation | Evidence and limits |
+| --- | --- | --- |
+| REQ-116 | [embedding index](../src/embedding.rs), [HTTP ingestion/startup](../src/server.rs), [CLI](../src/main.rs) | `tests/embedding.rs::every_signed_field_reaches_the_model_without_utf8_truncation` reconstructs the exact signed canonical input. HTTP tests exercise publication/indexing and actual API search. The live model test indexes the pinned multi-chunk core divider. External bytes are represented by their signed descriptors until explicitly realized. |
+| REQ-117 | [cosine matching](../src/embedding.rs), [candidate/version filters](../src/query.rs) | Threshold/restart fixture and real Ollama test retrieve a bucket for “moving water” without lexical overlap, rank it above a lamp, and separate them by threshold. Synthetic vectors test mechanics; real model results establish only the exercised examples, not general semantic recall. |
+| REQ-118 | [committed receipts and recipe-separated storage](../src/embedding.rs), [API-only decimals](../src/canonical.rs) | Tests cover model-revision changes, restart reuse without object inference, tampered receipts, signed-input coverage and integer-only artifact compatibility. Query/object vectors and search scope/filter provenance are hashed; provider faithfulness is not attested. |
+| REQ-119 | [claim-scoped matching/status](../src/embedding.rs), [verification filters](../src/query.rs) | Supported/rigor tests reject an unverified bucket capability beside a passing unrelated claim; malformed vectors and corrupt records remain explicit. Existing core verification/revision tests still run. API tests cover index status and semantic mode. |
+
+[Embedding design and deployment](embeddings.md) specifies limits and replay.
+[CI](../.github/workflows/rust.yml) runs native Rust checks and real model retrieval
+before image publication. Failure to index is observable, not a verification claim.

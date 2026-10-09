@@ -118,7 +118,7 @@ enum Command {
         limit: usize,
     },
     /// Build or retry the configured embedding index.
-    IndexEmbeddings,
+    IndexEmbeddings { #[arg(long)] rebuild: bool },
     /// Serve public artifacts and queries; read-only and loopback by default.
     Serve {
         #[arg(long, env = "KNOWLEDGE_LISTEN", default_value = "127.0.0.1:8787")]
@@ -335,8 +335,8 @@ fn run(cli: Cli) -> Result<()> {
                     stdout.write_all(&canonical::encode_response(&result)?)?; stdout.write_all(b"\n")?;
                     Ok(())
                 },
-                Command::IndexEmbeddings => {
-                    let index=embedding::Index::configured(&cache)?.ok_or_else(|| Error::new("embedding_unavailable","configure an embedding endpoint and model"))?;
+                Command::IndexEmbeddings {rebuild} => {
+                    let index=embedding::Index::configure(&cache,rebuild)?.ok_or_else(|| Error::new("embedding_unavailable","configure an embedding endpoint and model"))?;
                     print(&index.status(cache.addresses()?.len()))
                 },
                 Command::Serve {
