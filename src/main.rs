@@ -4,7 +4,7 @@ use knowledge::{
     Error, Result, backing, canonical,
     model::{Artifact, Payload, Rigor, ScopeKind},
     query::{self, Query},
-    server,
+    server, embedding,
     store::Cache,
 };
 use rand_core::OsRng;
@@ -96,6 +96,10 @@ enum Command {
     Search {
         #[arg(default_value = "")]
         text: String,
+        #[arg(long, value_enum)]
+        mode: Option<query::Mode>,
+        #[arg(long)]
+        threshold: Option<f64>,
         #[arg(long)]
         trust_publisher: Option<String>,
         #[arg(long)]
@@ -113,6 +117,8 @@ enum Command {
         #[arg(long, default_value_t = 20)]
         limit: usize,
     },
+    /// Build or retry the configured embedding index.
+    IndexEmbeddings,
     /// Serve public artifacts and queries; read-only and loopback by default.
     Serve {
         #[arg(long, env = "KNOWLEDGE_LISTEN", default_value = "127.0.0.1:8787")]
@@ -299,7 +305,7 @@ fn run(cli: Cli) -> Result<()> {
                     substituter,
                 } => print(&cache.fetch(&address, &substituter)?),
                 Command::Search {
-                    text,
+                    text, mode, threshold,
                     trust_publisher,
                     include_incomplete,
                     physical,
@@ -308,10 +314,10 @@ fn run(cli: Cli) -> Result<()> {
                     supported_claims_only,
                     exclude_superseded,
                     limit,
-                } => print(&query::search(
-                    &cache,
-                    &Query {
-                        text,
+                } => {
+                    let index=if mode==Some(query::Mode::Lexical) {None} else {embedding::Index::configured(&cache)?};
+                    let query=Query {
+                        text,mode,threshold,
                         trust_publisher,
                         include_incomplete,
                         rigor: if physical {
@@ -323,8 +329,16 @@ fn run(cli: Cli) -> Result<()> {
                         exclude_superseded,
                         limit,
                         scope,
-                    },
-                )?),
+                    };
+                    let result=embedding::search(&cache,&query,index.as_ref())?;
+                    let mut stdout=std::io::stdout().lock();
+                    stdout.write_all(&canonical::encode_response(&result)?)?; stdout.write_all(b"\n")?;
+                    Ok(())
+                },
+                Command::IndexEmbeddings => {
+                    let index=embedding::Index::configured(&cache)?.ok_or_else(|| Error::new("embedding_unavailable","configure an embedding endpoint and model"))?;
+                    print(&index.status(cache.addresses()?.len()))
+                },
                 Command::Serve {
                     listen,
                     allow_network,
@@ -339,7 +353,8 @@ fn run(cli: Cli) -> Result<()> {
                     }
                     let http = server::bind_with_network(listen, allow_network)?;
                     eprintln!("knowledge listening on {listen}; public artifacts only");
-                    server::serve(http, &cache, &allow_publisher)
+                    let index=embedding::Index::configured(&cache)?;
+                    server::serve_with_index(http, &cache, &allow_publisher,index)
                 }
                 _ => unreachable!(),
             }

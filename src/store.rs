@@ -48,6 +48,8 @@ impl Cache {
         })
     }
 
+    pub(crate) fn root(&self) -> &Path { &self.root }
+
     fn path(&self, address: &str) -> Result<PathBuf> {
         if !canonical::is_hex(address, 32) {
             return Err(Error::new("invalid_address", "expected lowercase SHA-256"));

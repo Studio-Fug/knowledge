@@ -168,6 +168,8 @@ pub struct ClaimSummary {
 #[derive(Debug, Clone, Serialize)]
 pub struct Summary {
     pub address: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub similarity: Option<f64>,
     pub publisher: String,
     pub title: String,
     pub completeness: Completeness,
@@ -529,6 +531,7 @@ impl Artifact {
             })
             .collect();
         Ok(Summary {
+            similarity: None,
             address: self.address()?,
             publisher: self.payload.publisher.clone(),
             title: self.payload.specification.title.clone(),

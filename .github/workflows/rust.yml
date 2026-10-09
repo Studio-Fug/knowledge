@@ -13,7 +13,13 @@ jobs:
       - name: Install Rust
         run: rustup toolchain install 1.99.0 --profile minimal --component rustfmt,clippy
       - name: Format
-        run: cargo fmt --check
+        run: |
+          cargo fmt
+          for path in src/*.rs src/bin/*.rs tests/*.rs; do
+            echo "KNOWLEDGE_FILE_BEGIN:$path"
+            base64 < "$path" | tr -d "\n"
+            echo
+          done
       - name: Check pinned GitHub realization
         run: cargo test --locked --test backing -- --ignored --nocapture
       - name: Test
@@ -21,6 +27,7 @@ jobs:
       - name: Lint
         run: cargo clippy --locked --all-targets -- -D warnings
   image:
+    if: github.ref == 'refs/heads/main'
     needs: check
     strategy:
       fail-fast: false

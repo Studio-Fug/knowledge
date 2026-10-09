@@ -1,7 +1,8 @@
 use crate::{
     Error, Result, canonical,
     model::Artifact,
-    query::{self, Query},
+    embedding::{self, Index},
+    query::Query,
     store::Cache,
 };
 use std::{io::Read, net::SocketAddr};
@@ -36,17 +37,18 @@ fn body(request: &mut Request) -> Result<Vec<u8>> {
     Ok(bytes)
 }
 
-fn route(request: &mut Request, cache: &Cache, publishers: &[String]) -> Result<Vec<u8>> {
+fn route(request: &mut Request, cache: &Cache, publishers: &[String], mut index: Option<&mut Index>) -> Result<Vec<u8>> {
     let method = request.method().clone();
     let path = request.url().to_owned();
     match (method, path.as_str()) {
         (Method::Get, "/health") => Ok(br#"{"status":"ok","mode":"public_cache"}"#.to_vec()),
+        (Method::Get, "/v1/embeddings/status") => canonical::encode(&index.as_ref().map(|i| i.status(cache.addresses().map_or(0, |a| a.len()))).unwrap_or(embedding::IndexStatus {enabled:false,indexed:0,total:cache.addresses()?.len(),failures:Default::default(),recipe:None})),
         (Method::Get, path) if path.starts_with("/v1/artifacts/") => {
             canonical::encode(&cache.get(&path[14..])?)
         }
         (Method::Post, "/v1/search") => {
-            let query: Query = canonical::parse(&body(request)?)?;
-            canonical::encode(&query::search(cache, &query)?)
+            let query: Query = canonical::parse_request(&body(request)?)?;
+            canonical::encode_response(&embedding::search(cache, &query, index.as_deref())?)
         }
         (Method::Post, "/v1/artifacts") => {
             if publishers.is_empty() {
@@ -56,14 +58,20 @@ fn route(request: &mut Request, cache: &Cache, publishers: &[String]) -> Result<
             if !publishers.contains(&artifact.payload.publisher) {
                 return Err(Error::new("forbidden", "publisher is not allowed"));
             }
-            canonical::encode(&serde_json::json!({"address":cache.put(&artifact)?}))
+            let address=cache.put(&artifact)?;
+            let indexing=index.as_mut().map(|i| if i.ingest(&artifact) {"indexed"} else {"failed"}).unwrap_or("disabled");
+            canonical::encode(&serde_json::json!({"address":address,"indexing":indexing}))
         }
         _ => Err(Error::new("not_found", "unknown route")),
     }
 }
 
-pub fn handle(mut request: Request, cache: &Cache, publishers: &[String]) -> Result<()> {
-    let (status, bytes) = match route(&mut request, cache, publishers) {
+pub fn handle(request: Request, cache: &Cache, publishers: &[String]) -> Result<()> {
+    handle_with_index(request,cache,publishers,None)
+}
+
+pub fn handle_with_index(mut request: Request, cache: &Cache, publishers: &[String], index: Option<&mut Index>) -> Result<()> {
+    let (status, bytes) = match route(&mut request, cache, publishers,index) {
         Ok(bytes) => (200, bytes),
         Err(error) => {
             let status = match error.code {
@@ -71,6 +79,7 @@ pub fn handle(mut request: Request, cache: &Cache, publishers: &[String]) -> Res
                 "not_found" => 404,
                 "too_large" => 413,
                 "io" => 500,
+                "embedding_unavailable" | "embedding_model_changed" | "invalid_embedding" => 503,
                 _ => 400,
             };
             (status, serde_json::to_vec(&error)?)
@@ -87,8 +96,12 @@ pub fn handle(mut request: Request, cache: &Cache, publishers: &[String]) -> Res
 }
 
 pub fn serve(server: Server, cache: &Cache, publishers: &[String]) -> Result<()> {
+    serve_with_index(server,cache,publishers,None)
+}
+
+pub fn serve_with_index(server: Server, cache: &Cache, publishers: &[String], mut index: Option<Index>) -> Result<()> {
     for request in server.incoming_requests() {
-        if let Err(error) = handle(request, cache, publishers) {
+        if let Err(error) = handle_with_index(request, cache, publishers,index.as_mut()) {
             eprintln!("request failed: {error}");
         }
     }

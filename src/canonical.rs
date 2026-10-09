@@ -10,45 +10,47 @@ use std::{collections::BTreeSet, fmt};
 
 pub const MAX_BYTES: usize = 4 * 1024 * 1024;
 
-struct Unique(Value);
+struct Unique<const FLOATS: bool>(Value);
 
-impl<'de> Deserialize<'de> for Unique {
+impl<'de, const FLOATS: bool> Deserialize<'de> for Unique<FLOATS> {
     fn deserialize<D: serde::Deserializer<'de>>(
         deserializer: D,
     ) -> std::result::Result<Self, D::Error> {
-        struct JsonVisitor;
-        impl<'de> Visitor<'de> for JsonVisitor {
-            type Value = Unique;
+        struct JsonVisitor<const FLOATS: bool>;
+        impl<'de, const FLOATS: bool> Visitor<'de> for JsonVisitor<FLOATS> {
+            type Value = Unique<FLOATS>;
             fn expecting(&self, f: &mut fmt::Formatter) -> fmt::Result {
                 f.write_str("unambiguous integer-only JSON")
             }
-            fn visit_bool<E: de::Error>(self, v: bool) -> std::result::Result<Unique, E> {
+            fn visit_bool<E: de::Error>(self, v: bool) -> std::result::Result<Unique<FLOATS>, E> {
                 Ok(Unique(Value::Bool(v)))
             }
-            fn visit_i64<E: de::Error>(self, v: i64) -> std::result::Result<Unique, E> {
+            fn visit_i64<E: de::Error>(self, v: i64) -> std::result::Result<Unique<FLOATS>, E> {
                 Ok(Unique(Value::Number(Number::from(v))))
             }
-            fn visit_u64<E: de::Error>(self, v: u64) -> std::result::Result<Unique, E> {
+            fn visit_u64<E: de::Error>(self, v: u64) -> std::result::Result<Unique<FLOATS>, E> {
                 Ok(Unique(Value::Number(Number::from(v))))
             }
-            fn visit_f64<E: de::Error>(self, _: f64) -> std::result::Result<Unique, E> {
-                Err(E::custom("floating-point numbers are unsupported"))
+            fn visit_f64<E: de::Error>(self, value: f64) -> std::result::Result<Unique<FLOATS>, E> {
+                if FLOATS {
+                    Number::from_f64(value).map(|n| Unique(Value::Number(n))).ok_or_else(|| E::custom("non-finite numbers are unsupported"))
+                } else { Err(E::custom("floating-point numbers are unsupported")) }
             }
-            fn visit_str<E: de::Error>(self, v: &str) -> std::result::Result<Unique, E> {
+            fn visit_str<E: de::Error>(self, v: &str) -> std::result::Result<Unique<FLOATS>, E> {
                 Ok(Unique(Value::String(v.into())))
             }
-            fn visit_string<E: de::Error>(self, v: String) -> std::result::Result<Unique, E> {
+            fn visit_string<E: de::Error>(self, v: String) -> std::result::Result<Unique<FLOATS>, E> {
                 Ok(Unique(Value::String(v)))
             }
-            fn visit_unit<E: de::Error>(self) -> std::result::Result<Unique, E> {
+            fn visit_unit<E: de::Error>(self) -> std::result::Result<Unique<FLOATS>, E> {
                 Ok(Unique(Value::Null))
             }
             fn visit_seq<A: SeqAccess<'de>>(
                 self,
                 mut seq: A,
-            ) -> std::result::Result<Unique, A::Error> {
+            ) -> std::result::Result<Unique<FLOATS>, A::Error> {
                 let mut values = Vec::new();
-                while let Some(Unique(value)) = seq.next_element()? {
+                while let Some(Unique(value)) = seq.next_element::<Unique<FLOATS>>()? {
                     values.push(value);
                 }
                 Ok(Unique(Value::Array(values)))
@@ -56,10 +58,10 @@ impl<'de> Deserialize<'de> for Unique {
             fn visit_map<A: MapAccess<'de>>(
                 self,
                 mut map: A,
-            ) -> std::result::Result<Unique, A::Error> {
+            ) -> std::result::Result<Unique<FLOATS>, A::Error> {
                 let mut seen = BTreeSet::new();
                 let mut values = Map::new();
-                while let Some((key, Unique(value))) = map.next_entry::<String, Unique>()? {
+                while let Some((key, Unique(value))) = map.next_entry::<String, Unique<FLOATS>>()? {
                     if !seen.insert(key.clone()) {
                         return Err(de::Error::custom("duplicate object key"));
                     }
@@ -68,7 +70,7 @@ impl<'de> Deserialize<'de> for Unique {
                 Ok(Unique(Value::Object(values)))
             }
         }
-        deserializer.deserialize_any(JsonVisitor)
+        deserializer.deserialize_any(JsonVisitor::<FLOATS>)
     }
 }
 
@@ -76,7 +78,7 @@ pub fn parse<T: serde::de::DeserializeOwned>(bytes: &[u8]) -> Result<T> {
     if bytes.len() > MAX_BYTES {
         return Err(Error::new("too_large", "artifact or request exceeds 4 MiB"));
     }
-    let Unique(value) = serde_json::from_slice(bytes)?;
+    let Unique(value): Unique<false> = serde_json::from_slice(bytes)?;
     Ok(serde_json::from_value(value)?)
 }
 
@@ -134,4 +136,17 @@ pub fn is_hex(value: &str, bytes: usize) -> bool {
         && value
             .bytes()
             .all(|c| c.is_ascii_digit() || (b'a'..=b'f').contains(&c))
+}
+
+/// API queries may use decimal thresholds; artifact canonicalization stays integer-only.
+pub fn parse_request<T: serde::de::DeserializeOwned>(bytes: &[u8]) -> Result<T> {
+    if bytes.len() > MAX_BYTES { return Err(Error::new("too_large", "request exceeds 4 MiB")); }
+    let Unique(value): Unique<true> = serde_json::from_slice(bytes)?;
+    Ok(serde_json::from_value(value)?)
+}
+
+pub fn encode_response<T: Serialize>(value: &T) -> Result<Vec<u8>> {
+    let bytes = serde_json::to_vec(value)?;
+    if bytes.len() > MAX_BYTES { return Err(Error::new("too_large", "response exceeds 4 MiB")); }
+    Ok(bytes)
 }

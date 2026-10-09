@@ -6,10 +6,12 @@ use crate::{
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeSet;
 
-#[derive(Debug, Default, Deserialize, Serialize)]
+#[derive(Debug, Clone, Default, Deserialize, Serialize)]
 #[serde(default, deny_unknown_fields)]
 pub struct Query {
     pub text: String,
+    pub mode: Option<Mode>,
+    pub threshold: Option<f64>,
     pub trust_publisher: Option<String>,
     pub include_incomplete: bool,
     pub rigor: Option<Rigor>,
@@ -19,11 +21,17 @@ pub struct Query {
     pub limit: usize,
 }
 
+#[derive(Debug, Clone, Copy, Deserialize, Serialize, clap::ValueEnum, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum Mode { Lexical, Semantic }
+
 #[derive(Serialize)]
 pub struct Search {
     pub matches: Vec<Summary>,
     pub scanned: usize,
     pub scope: &'static str,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub semantic: Option<crate::embedding::SearchEvidence>,
 }
 
 fn tokens(text: &str) -> BTreeSet<String> {
@@ -76,7 +84,7 @@ fn close(a: &str, b: &str) -> bool {
     edits + (a.len() - i) + (b.len() - j) <= 1
 }
 
-pub fn search(cache: &Cache, query: &Query) -> Result<Search> {
+pub(crate) fn candidates(cache: &Cache, query: &Query, lexical: bool) -> Result<(Vec<(crate::model::Artifact, Summary)>, usize)> {
     if query.text.len() > 8192 || query.limit > 100 {
         return Err(Error::new("invalid_query", "query exceeds limits"));
     }
@@ -87,6 +95,7 @@ pub fn search(cache: &Cache, query: &Query) -> Result<Search> {
     {
         return Err(Error::new("invalid_key", "invalid trusted publisher"));
     }
+    if query.threshold.is_some_and(|t| !t.is_finite() || !(-1.0..=1.0).contains(&t)) { return Err(Error::new("invalid_query", "threshold must be between -1 and 1")); }
     let wanted = tokens(&query.text);
     let addresses = cache.addresses()?;
     let mut eligible = Vec::new();
@@ -134,7 +143,7 @@ pub fn search(cache: &Cache, query: &Query) -> Result<Search> {
             )
         };
         let available = tokens(&text);
-        if !wanted.iter().all(|w| available.iter().any(|a| close(w, a))) {
+        if lexical && !wanted.iter().all(|w| available.iter().any(|a| close(w, a))) {
             continue;
         }
         if (query.supported_claims_only || query.rigor.is_some()) && claims.is_empty() {
@@ -142,6 +151,10 @@ pub fn search(cache: &Cache, query: &Query) -> Result<Search> {
         }
         eligible.push((artifact, summary));
     }
+    Ok((eligible, addresses.len()))
+}
+
+pub(crate) fn select(eligible: Vec<(crate::model::Artifact, Summary)>, query: &Query) -> Vec<Summary> {
     let superseded: BTreeSet<_> = eligible
         .iter()
         .flat_map(|(a, _)| {
@@ -159,15 +172,15 @@ pub fn search(cache: &Cache, query: &Query) -> Result<Search> {
         })
         .collect();
     let limit = if query.limit == 0 { 20 } else { query.limit };
-    let matches = eligible
+    eligible
         .into_iter()
         .map(|(_, s)| s)
         .filter(|s| !query.exclude_superseded || !superseded.contains(&s.address))
         .take(limit)
-        .collect();
-    Ok(Search {
-        matches,
-        scanned: addresses.len(),
-        scope: "local_cache; publisher_assertions; eligible_revisions_only",
-    })
+        .collect()
+}
+
+pub fn search(cache: &Cache, query: &Query) -> Result<Search> {
+    let (eligible, scanned) = candidates(cache, query, true)?;
+    Ok(Search { matches: select(eligible, query), scanned, scope: "local_cache; publisher_assertions; eligible_revisions_only", semantic: None })
 }
