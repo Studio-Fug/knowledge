@@ -316,6 +316,7 @@ impl Index {
 
 pub fn search(cache: &Cache, query: &Query, index: Option<&Index>) -> Result<Search> {
     match query.mode {
+        Some(Mode::Lexical) if query.threshold.is_some()=>Err(Error::new("invalid_query","similarity thresholds require semantic mode")),
         Some(Mode::Lexical)=>query::search(cache,query),
         Some(Mode::Semantic)=>index.ok_or_else(|| Error::new("embedding_unavailable", "semantic embeddings are not configured"))?.search(cache,query),
         None if index.is_some() && !query.text.trim().is_empty()=>index.unwrap().search(cache,query),

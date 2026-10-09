@@ -9,7 +9,7 @@ requirements:
     silently dropping fields or truncating content shall not count as complete ingestion.
   refines: [REQ-103]
   status: approved
-  modules: [src/embedding.rs, src/server.rs]
+  modules: [src/embedding.rs, src/server.rs, src/main.rs]
   method: TM-007
   tags: [discovery, initial, embeddings]
 - id: REQ-117

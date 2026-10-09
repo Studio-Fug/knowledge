@@ -298,7 +298,13 @@ fn run(cli: Cli) -> Result<()> {
                 }
                 Command::Put { input } => {
                     let artifact = canonical::parse(&read(&input)?)?;
-                    print(&serde_json::json!({"address":cache.put(&artifact)?}))
+                    let address=cache.put(&artifact)?;
+                    let indexing=match embedding::Index::configured(&cache) {
+                        Ok(Some(index)) => if index.status(cache.addresses()?.len()).failures.contains_key(&address) {"failed"} else {"indexed"},
+                        Ok(None)=>"disabled",
+                        Err(_)=>"failed",
+                    };
+                    print(&serde_json::json!({"address":address,"indexing":indexing}))
                 }
                 Command::Get {
                     address,

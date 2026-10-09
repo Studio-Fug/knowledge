@@ -59,10 +59,10 @@ inference or incomplete external content into verified/reusable designs.
 ## Ingestion and checking state
 
 The server backfills all existing objects at startup and indexes each accepted
-HTTP publication. Publication returns `indexing: indexed`, `failed` or `disabled`;
+HTTP or CLI publication. Publication returns `indexing: indexed`, `failed` or `disabled`;
 an embedding failure does not undo a valid immutable artifact insertion. CLI
 imports remain valid without a model and are backfilled when the configured
-server next starts. Stop the server before running the offline indexing command,
+server next starts. When configured, CLI publication also builds/checks the index. Stop the server before running the offline indexing command,
 because the cache has one process owner:
 
 ```sh
