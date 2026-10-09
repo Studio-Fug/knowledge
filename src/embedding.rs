@@ -3,7 +3,7 @@ use crate::{canonical, model::Artifact, query::{self, Mode, Query, Search}, stor
 use serde::{Deserialize, Serialize};
 use std::{collections::BTreeMap, fs::{self, File}, io::{Read, Write}, path::PathBuf, time::Duration};
 
-const CHUNK_BYTES: usize = 2048;
+const CHUNK_BYTES: usize = 1024;
 const MAX_DIMENSIONS: usize = 4096;
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -16,7 +16,7 @@ pub struct Recipe {
 }
 impl Recipe {
     pub fn new(endpoint: String, model: String, revision: String) -> Self {
-        Self { endpoint, model, revision, format: "canonical-json-or-query-utf8;2048-byte-chunks;unit-mean-unit-f32:v1".into() }
+        Self { endpoint, model, revision, format: "canonical-json-or-query-utf8;1024-byte-chunks;unit-mean-unit-f32:v1".into() }
     }
 }
 
@@ -92,7 +92,7 @@ pub struct Record {
 pub struct Receipt { pub sha256: String, pub record: Record }
 impl Receipt {
     pub fn validate(&self) -> Result<()> {
-        if canonical::digest(&canonical::encode(&self.record)?) != self.sha256 || !canonical::is_hex(&self.record.input_sha256,32) || self.record.chunks == 0 || self.record.chunks > 2048 {
+        if canonical::digest(&canonical::encode(&self.record)?) != self.sha256 || !canonical::is_hex(&self.record.input_sha256,32) || self.record.chunks == 0 || self.record.chunks > 4096 {
             return Err(Error::new("invalid_embedding", "embedding record commitment is invalid"));
         }
         let vector = self.vector();
@@ -274,7 +274,7 @@ impl Index {
         let (candidates,scanned)=query::candidates(cache,query,false)?;
         let embedding=produce(self.provider.as_ref(),&query.text,"query")?;
         let query_vector=embedding.vector();
-        let threshold=query.threshold.unwrap_or(0.6);
+        let threshold=query.threshold.unwrap_or(0.2);
         let mut eligible=Vec::new(); let mut skipped=BTreeMap::new();
         let mut qualifying=BTreeMap::new();
         let mut considered=BTreeMap::new();

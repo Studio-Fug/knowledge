@@ -42,7 +42,7 @@ curl -s http://knowledge:8787/v1/search \
   -d '{"text":"combine RF signals","mode":"semantic","threshold":0.3,"include_incomplete":true}'
 ```
 
-`threshold` is an inclusive cosine threshold between -1 and 1 (default 0.6).
+`threshold` is an inclusive cosine threshold between -1 and 1 (default 0.2).
 There is no universal probability or acceptance meaning to a score. Calibrate the
 threshold to the model and your catalog; a value of -1 lists all semantically
 scored eligible candidates for inspection. Results contain `similarity`, ordered
@@ -88,7 +88,7 @@ data available to the cache. This indexes declared content, not an understanding
 of unavailable realized designs. Binary blob bytes remain their canonical hex
 representation; model usefulness for binary-heavy data is an empirical limitation.
 
-The canonical UTF-8 input is split at character boundaries into at most 2048-byte
+The canonical UTF-8 input is split at character boundaries into at most 1024-byte
 chunks. Every chunk is sent with truncation disabled, in batches of up to 16.
 Each returned vector is normalized, their mean is normalized, and the final f32
 vector is retained. Empty, zero, non-finite, oversized or inconsistent vectors

@@ -118,7 +118,7 @@ fn real_model_indexes_the_multichunk_core_artifact_and_its_actual_signed_bytes()
 
 #[test]
 fn ollama_adapter_uses_all_chunks_disables_truncation_and_checks_model_identity() {
- use std::{io::Read,thread};
+ use std::thread;
  use tiny_http::{Server,Response};
  let server=Server::http("127.0.0.1:0").unwrap();let endpoint=format!("http://{}",server.server_addr());
  let thread=thread::spawn(move || {
